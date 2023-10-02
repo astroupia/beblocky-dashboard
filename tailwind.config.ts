@@ -1,5 +1,5 @@
-import { fontFamily } from "tailwindcss/defaultTheme"
 import { nextui } from "@nextui-org/react";
+import { fontFamily } from "tailwindcss/defaultTheme";
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -59,17 +59,33 @@ module.exports = {
           foreground: "hsl(var(--card-foreground))",
         },
         brand: {
-          primary: {
-            200: "#FFE9D8",
-            400: "#FFD4B0",
-            600: "#FFBE88",
-            800: "#FFA95E",
+          primary:{
+            orange: {
+              200: "#FFE9D8",
+              400: "#FFD4B0",
+              600: "#FFBE88",
+              800: "#FFA95E"
+            },
+            purple:{
+              200: "#E8D6FF",
+              400: "#D2ADFF",
+              600: "#BA84FF",
+              800: "#A359FF"
+            }
           },
-          secondary: {
-            200: "#E8D6FF",
-            400: "#D2ADFF",
-            600: "#BA84FF",
-            800: "#A359FF"
+          secondary:{
+            lemon: {
+              200: "#FFFED8",
+              400: "#FFFCB2",
+              600: "#FFFB88",
+              800: "#FFF95A"
+            },
+            green:{
+              200: "#DCFCEF",
+              400: "#B6F8E0",
+              600: "#8FF5CF",
+              800: "#60F0BF"
+            }
           },
           green: "#68b946",
           orange: "#FFA95E",
@@ -80,6 +96,7 @@ module.exports = {
         ecstasy: { DEFAULT: '#F57C13', 50: '#FCDEC3', 100: '#FCD3B0', 200: '#FABD88', 300: '#F8A761', 400: '#F7923A', 500: '#F57C13', 600: '#C76108', 700: '#924706', 800: '#5C2D04', 900: '#261302', 950: '#0B0500' },
         'dark-ebony': { DEFAULT: '#3E1F04', 50: '#EA750F', 100: '#D76C0E', 200: '#B1580B', 300: '#8B4509', 400: '#643206', 500: '#3E1F04', 600: '#090501', 700: '#000000', 800: '#000000', 900: '#000000', 950: '#000000' },
       },
+    
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

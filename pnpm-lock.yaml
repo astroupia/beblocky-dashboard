@@ -14,6 +14,9 @@ dependencies:
   '@hookform/resolvers':
     specifier: ^3.3.1
     version: 3.3.1(react-hook-form@7.46.1)
+  '@loglib/tracker':
+    specifier: ^0.8.0
+    version: 0.8.0(react@18.2.0)
   '@nextui-org/checkbox':
     specifier: ^2.0.19
     version: 2.0.19(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.3.3)
@@ -1017,6 +1020,15 @@ packages:
       lodash: 4.17.21
     dev: false
     optional: true
+
+  /@loglib/tracker@0.8.0(react@18.2.0):
+    resolution: {integrity: sha512-WShEN7s4fcmWaWgBNmx4sDNaoLPudvfmopHxeJpWTAb4SEpypRsk4Kx143UQQEvFHE+jPQi/P3m8ennpVqFWAg==}
+    peerDependencies:
+      react: ^16.8||^17||^18
+    dependencies:
+      react: 18.2.0
+      web-vitals: 3.5.0
+    dev: false
 
   /@next/env@13.4.19:
     resolution: {integrity: sha512-FsAT5x0jF2kkhNkKkukhsyYOrRqtSxrEhfliniIq0bwWbuXLgyt3Gv0Ml+b91XwjwArmuP7NxCiGd++GGKdNMQ==}
@@ -7540,6 +7552,10 @@ packages:
     dependencies:
       glob-to-regexp: 0.4.1
       graceful-fs: 4.2.11
+    dev: false
+
+  /web-vitals@3.5.0:
+    resolution: {integrity: sha512-f5YnCHVG9Y6uLCePD4tY8bO/Ge15NPEQWtvm3tPzDKygloiqtb4SVqRHBcrIAqo2ztqX5XueqDn97zHF0LdT6w==}
     dev: false
 
   /webidl-conversions@3.0.1:

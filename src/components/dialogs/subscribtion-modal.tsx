@@ -102,11 +102,13 @@ export const SubscriptionModal = () => {
                                     <CardHeader>
                                         <CardTitle className=" md:flex-row flex-col flex gap-2 md:items-center justify-between">
                                             {plan.name}
-                                            <p className=" text-orange-600">
-                                                {plan.name === "Standard" && "Popular"}
-                                            </p>
+                                            {plan.name === "Standard" &&
+                                                <p className=" text-orange-600 border p-1 px-2 rounded-lg border-ecstasy">
+                                                    Popular
+                                                </p>
+                                            }
                                         </CardTitle>
-                                        <CardDescription className=" break-words overflow-hidden text-xs md:text-base">
+                                        <CardDescription className="break-words overflow-hidden text-xs md:text-base">
                                             {plan.description}
                                         </CardDescription>
                                     </CardHeader>

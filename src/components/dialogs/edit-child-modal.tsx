@@ -12,7 +12,7 @@ import { useAuthContext } from "../context/auth-context"
 import { Loading } from "../loading"
 import { Button } from "../ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
-import { Form, FormControl, FormField, FormItem } from "../ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form"
 import { Input } from "../ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { toast } from "../ui/use-toast"
@@ -67,6 +67,9 @@ export const EditChildModal = ({ student, classrooms }: { student: Student, clas
                             render={({ field }) => {
                                 return (
                                     <FormItem>
+                                        <FormLabel>
+                                            Full Name
+                                        </FormLabel>
                                         <FormControl>
                                             <Input placeholder="Name" {...field} />
                                         </FormControl>
@@ -80,6 +83,9 @@ export const EditChildModal = ({ student, classrooms }: { student: Student, clas
                             render={({ field }) => {
                                 return (
                                     <FormItem>
+                                        <FormLabel>
+                                            Username
+                                        </FormLabel>
                                         <FormControl>
                                             <Input placeholder="Username" {...field} />
                                         </FormControl>

@@ -33,7 +33,7 @@ export function SideBar({ items }: Props) {
       <Image
         src={Logo}
         alt="Beblocky logo"
-        className="px-2"
+        className=" p-4 px-8"
         width={180}
         height={180}
       />

@@ -39,3 +39,5 @@ export interface School {
 }
 
 export interface StudentCourse {}
+
+export type Role = "parent" | "school" | "student";

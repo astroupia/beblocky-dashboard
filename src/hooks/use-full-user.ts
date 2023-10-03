@@ -1,46 +1,46 @@
 import { useAuthContext } from "@/components/context/auth-context";
+import firebase_app from "@/lib/firebase/firebase-client";
+import { FirebaseApp } from "firebase/app";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { getFirestore, doc, getDoc, DocumentData } from 'firebase/firestore';
-import firebase_app from '@/lib/firebase/firebase-client';
-import { FirebaseApp } from 'firebase/app';
 
 type UserAccountData = {
-    role: string,
-    parentId: string
-}
+  role: "parent" | "student" | "school";
+  parentId: string;
+};
 const useGetFullUser = () => {
-    const { user } = useAuthContext();
-    const [userAccountData, setUserAccountData] = useState<UserAccountData>();
-    const [isLoading, setLoading] = useState(true);
+  const { user } = useAuthContext();
+  const [userAccountData, setUserAccountData] = useState<UserAccountData>();
+  const [isLoading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (user) {
-            const fetchUserAccountData = async () => {
-                const db = getFirestore(firebase_app as FirebaseApp);
-                const userRef = doc(db, "users", user.uid);
+  useEffect(() => {
+    if (user) {
+      const fetchUserAccountData = async () => {
+        const db = getFirestore(firebase_app as FirebaseApp);
+        const userRef = doc(db, "users", user.uid);
 
-                try {
-                    const docSnap = await getDoc(userRef);
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        setUserAccountData(data as UserAccountData);
-                    } else {
-                        setUserAccountData(undefined);
-                    }
-                } catch (error) {
-                    setUserAccountData(undefined);
-                } finally {
-                    setLoading(false);
-                }
-            };
-            fetchUserAccountData();
-        } else {
-            setLoading(false);
+        try {
+          const docSnap = await getDoc(userRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            setUserAccountData(data as UserAccountData);
+          } else {
             setUserAccountData(undefined);
+          }
+        } catch (error) {
+          setUserAccountData(undefined);
+        } finally {
+          setLoading(false);
         }
-    }, [user]);
+      };
+      fetchUserAccountData();
+    } else {
+      setLoading(false);
+      setUserAccountData(undefined);
+    }
+  }, [user]);
 
-    return { userAccountData, isLoading };
+  return { userAccountData, isLoading };
 };
 
 export default useGetFullUser;

@@ -26,12 +26,15 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { doc, getFirestore, setDoc } from "firebase/firestore";
-import { School2, Users } from "lucide-react";
+import { School2, User, Users } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { errorToast } from "../../../lib/error-toast";
 
+import { getClassroom } from "@/actions/classroom";
+import { createStudent } from "@/actions/student";
 import { Loading } from "@/components/loading";
 import { Checkbox } from "@/components/ui/checkbox";
+import useCourses from "@/hooks/user-courses";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -44,9 +47,19 @@ export default function page() {
   });
   const router = useRouter();
   const [isSignUpLoading, setIsSingUpLoading] = useState(false);
+  const { courses } = useCourses();
   async function onSubmit(data: SignUpSchema) {
     setIsSingUpLoading(true);
     const { email, password, role } = data;
+    let parentId = "";
+    if (data.classCode) {
+      parentId = (await getClassroom(data.classCode)).userId;
+      if (!parentId) {
+        form.setError("classCode", { message: "Classroom isn't found!" });
+        setIsSingUpLoading(false);
+        return;
+      }
+    }
     try {
       await createUserWithEmailAndPassword(auth, email, password).then(
         async ({ user }) => {
@@ -58,35 +71,22 @@ export default function page() {
               name: data.name,
               role: data.role,
               credit: 0,
-            }).then(async () => {
-              await setDoc(doc(db, "School", user.uid), {
-                uid: user.uid,
-                name: data.name,
-                role: data.role,
-              }).then(async () => {
-                if (role === "parent") {
-                  await setDoc(
-                    doc(db, `School/${user.uid}/Classes`, "Class A"),
-                    {
-                      uid: user.uid,
-                      name: "Class A",
-                    }
-                  );
-                }
-              });
             });
-          }
-          await fetch("/api/sign-in", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${await user.getIdToken()}`,
-            },
-          }).then((response) => {
-            setIsSingUpLoading(false);
-            if (response.status === 200) {
-              router.push("/dashboard");
+            if (data.role === "student") {
+              if (!data.classCode) {
+                throw Error("Classroom isn't provided");
+              }
+              await createStudent({
+                parentId,
+                classroom: data.classCode,
+                studentUsername: data.email.replace("@beblocky.com", ""),
+                studentId: user.uid,
+                studentEmail: data.email as string,
+                studentName: data.name as string,
+              });
             }
-          });
+          }
+          router.push("/dashboard");
         }
       );
     } catch (error: any) {
@@ -136,12 +136,12 @@ export default function page() {
                             School
                           </div>
                         </SelectItem>
-                        {/* <SelectItem value="student">
-                                                    <div className="flex items-center gap-2">
-                                                        <User size={18} />
-                                                        Student
-                                                    </div>
-                                                </SelectItem> */}
+                        <SelectItem value="student">
+                          <div className="flex items-center gap-2">
+                            <User size={18} />
+                            Student
+                          </div>
+                        </SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -172,11 +172,38 @@ export default function page() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input {...field} placeholder="Email" className=" h-10" />
+                    <Input
+                      {...field}
+                      placeholder={
+                        form.getValues("role") === "student"
+                          ? "Username"
+                          : "Email"
+                      }
+                      className=" h-10"
+                    />
                   </FormControl>
                 </FormItem>
               )}
             />
+
+            {form.getValues("role") === "student" && (
+              <FormField
+                control={form.control}
+                name="classCode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Class Code"
+                        className=" h-10"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            )}
+
             <FormField
               control={form.control}
               name="password"

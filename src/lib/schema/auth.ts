@@ -14,14 +14,14 @@ export const signUpSchema = z
       .string({ required_error: "Please provide valid name!" })
       .refine((name) => name.includes(" "), "Please provide full name."),
     email: z
-      .string({ required_error: "Please provide valid email address!" })
-      .email("Please provide valid email address!"),
+      .string(),
     password: z
       .string({ required_error: "Please provide password!" })
       .refine((pass) => pass.length >= 8, "Password is less than 8 characters"),
     repeatPassword: z.string({
       required_error: "Please provide repeated password!",
     }),
+    classCode: z.string().optional(),
     terms: z
       .boolean({
         required_error: "Please accept terms and conditions before signing up.",
@@ -30,11 +30,19 @@ export const signUpSchema = z
         (accept) => accept,
         "Please accept terms and conditions before signing up."
       ),
-  })
+  }).refine(args=> args.role !== "student" ? z.string().email().safeParse(args.email).success : true, "Please Provide valid email address") 
   .refine(
     (args) => args.password === args.repeatPassword,
     "Password doesn't match!"
-  );
+  ).transform(args=> {
+   if( args.role === "student"){
+    return {
+      ...args,
+      email: `${args.email}@beblocky.com`
+    }
+   }
+   return args
+  }); 
 
 export const addChildSchema = z
   .object({

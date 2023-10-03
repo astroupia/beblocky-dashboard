@@ -15,7 +15,7 @@ export default function authLayout({ children }: Props) {
   return (
     <div className="grid lg:grid-cols-2 gap-4 lg:gap-x-12 lg:mb-0 w-full h-full">
       <div>
-        <Image src={Logo} alt="Beblocky logo" className=" p-4 h-28 w-48" />
+        <Image src={Logo} alt="Beblocky logo" className=" p-4 h-20 w-44" />
         <div className="flex flex-col justify-center items-center mt-10 mb-6">
           <h2 className="lg:text-7xl text-2xl font-bold font-heading tracking-tight mb-4 text-ecstasy">
             Hi, there!

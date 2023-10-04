@@ -45,7 +45,7 @@ export const SubscriptionModal = () => {
     setOpen(subscription.userData === null);
   }, [subscription.userData]);
 
-  const plans = getPlans(userAccountData?.role ?? "parent");
+  const plans = getPlans(userAccountData?.role ?? "Parent");
   async function subscribeToPlan(plan: Plan) {
     setIsLoading(true);
     if (plan.name === "Free") {

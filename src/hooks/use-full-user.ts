@@ -5,7 +5,7 @@ import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
 type UserAccountData = {
-  role: "parent" | "student" | "school";
+  role: "Parent" | "Student" | "School";
   parentId: string;
 };
 const useGetFullUser = () => {

@@ -2,9 +2,9 @@ import { Role } from "@/types";
 
 export const getPlans = (role: Role): Plan[] => {
   role = role.toLowerCase() as Role;
-  const priceMultiplier = role === "parent" || role === "student" ? 1 : 10;
+  const priceMultiplier = role === "Parent" || role === "Student" ? 1 : 10;
   const studentCountMultiplier =
-    role === "parent" || role === "student" ? 1 : 10;
+    role === "Parent" || role === "Student" ? 1 : 10;
   return [
     {
       name: "Free",
@@ -65,7 +65,7 @@ export type Plan = {
   description: string;
 };
 
-/// [ ]10 25 50 for schools
+/// [*]10 25 50 for schools
 /// [*] Student Progress,
 /// [*] List plan benefits, school and parents plan should be separated,
 /// [ ] ide rounded boxes,

@@ -34,12 +34,6 @@ export const UpgradeTab = () => {
   const router = useRouter();
   const [yearly, setIsYearly] = useState(false);
 
-  const rolePrefix =
-    userAccountData?.role !== "student"
-      ? userAccountData?.role.toLowerCase() ?? "parent"
-      : "parent";
-  console.log(rolePrefix);
-
   async function subscribeToPlan(plan: Plan) {
     setIsLoading(true);
     if (plan.name === "Free") {
@@ -81,7 +75,7 @@ export const UpgradeTab = () => {
     setIsLoading(false);
     router.push(checkoutUrl);
   }
-  const plans = getPlans(userAccountData?.role ?? "parent");
+  const plans = getPlans(userAccountData?.role ?? "Parent");
   return (
     <Tabs
       aria-label="Options"

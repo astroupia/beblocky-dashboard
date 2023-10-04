@@ -109,7 +109,7 @@ export const SubscriptionModal = () => {
               </TabsTrigger>
               <p
                 className={cn(
-                  " absolute rounded-full opacity-70 w-6 h-6 font-bold flex p-2 items-center justify-center bg-brand-primary-800 -top-2 text-white -right-2 text-[8px]",
+                  " absolute rounded-full opacity-70 w-6 h-6 font-bold flex p-2 items-center justify-center bg-brand-primary-orange-800 -top-2 text-white -right-2 text-[8px]",
                   yearly && " opacity-100"
                 )}
               >

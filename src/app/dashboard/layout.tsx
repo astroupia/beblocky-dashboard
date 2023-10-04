@@ -28,11 +28,11 @@ const items: SidebarNavItem[] = [
     href: "/dashboard/upgrade",
     icon: "Cart",
   },
-  {
-    title: "Support",
-    href: "/dashboard/support",
-    icon: "Support",
-  },
+  // {
+  //   title: "Support",
+  //   href: "/dashboard/support",
+  //   icon: "Support",
+  // },
   {
     title: "Setting",
     href: "/dashboard/settings",

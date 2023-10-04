@@ -36,7 +36,7 @@ export default function page() {
     }
     await signInWithEmailAndPassword(auth, email, password)
       .then(async (userCred) => {
-        fetch("/api/sign-in", {
+        await fetch("/api/sign-in", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${await userCred.user.getIdToken()}`,

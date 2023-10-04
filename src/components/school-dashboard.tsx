@@ -37,6 +37,7 @@ export function SchoolDashboard({
             <div className=" w-full md:gap-4 md:space-y-0 space-y-2 md:flex items-center justify-between">
               <SearchBar className=" p-0 flex-grow" />
               <AddChildModal
+                studentsCount={students.length}
                 isSchool
                 classrooms={data.map((cls) => cls.classRoom)}
               />
@@ -49,9 +50,14 @@ export function SchoolDashboard({
                     No Student Added
                   </EmptyPlaceholder.Title>
                   <EmptyPlaceholder.Description>
-                    You haven't added any of your student yet. Start adding student.
+                    You haven't added any of your student yet. Start adding
+                    student.
                   </EmptyPlaceholder.Description>
-                  <AddChildModal isSchool classrooms={data.map((cls) => cls.classRoom)} />
+                  <AddChildModal
+                    isSchool
+                    classrooms={data.map((cls) => cls.classRoom)}
+                    studentsCount={0}
+                  />
                 </EmptyPlaceholder>
               </div>
             )}

@@ -13,11 +13,7 @@ export const ProgressTabs = ({ data }: props) => {
       {data?.length ? (
         <div className=" py-4 flex md:flex-row flex-col items-start gap-4">
           {data.map((student) => (
-            <StudentCard
-              classrooms={[]}
-              student={student}
-              key={student.name}
-            />
+            <StudentCard classrooms={[]} student={student} key={student.name} />
           ))}
         </div>
       ) : (
@@ -26,7 +22,7 @@ export const ProgressTabs = ({ data }: props) => {
           <EmptyPlaceholder.Title>
             No Children/Student Added
           </EmptyPlaceholder.Title>
-          <AddChildModal />
+          <AddChildModal studentsCount={data.length} />
         </EmptyPlaceholder>
       )}
     </>

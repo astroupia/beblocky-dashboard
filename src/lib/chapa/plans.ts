@@ -68,8 +68,8 @@ export type Plan = {
 /// [*]10 25 50 for schools
 /// [*] Student Progress,
 /// [*] List plan benefits, school and parents plan should be separated,
-/// [ ] ide rounded boxes,
-/// [ ] course card fix ui
+/// [*] ide rounded boxes,
+/// [*] course card fix ui
 /// [*] Student sign up with class code
 /// [ ] Existing Student Add Username
 /// [ ] Default type of course app

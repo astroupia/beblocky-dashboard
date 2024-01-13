@@ -9,13 +9,14 @@ import { auth } from "@/lib/firebase/firebase-auth";
 import { SignInSchema, signInSchema } from "@/lib/schema/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getRedirectResult, signInWithEmailAndPassword } from "firebase/auth";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function page() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   useEffect(() => {
     getRedirectResult(auth).then(async (userCred) => {
       if (!userCred) {
@@ -44,7 +45,6 @@ export default function page() {
         }).then((response) => {
           if (response.status === 200) {
             router.push("/dashboard");
-            setIsLoading(false);
           }
         });
       })
@@ -56,6 +56,10 @@ export default function page() {
         setIsLoading(false);
       });
   }
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, []);
   return (
     <div>
       <Form {...form}>

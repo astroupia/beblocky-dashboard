@@ -47,7 +47,10 @@ export async function getDashboardData() {
     }
     const student = await getDocs(
       query(collection(db, "students"), where("userId", "==", user.uid))
-    ).then((res) => res.docs[0].data() as Student);
+    ).then((res) => res.docs[0]?.data() as Student);
+    if (!student) {
+      return null;
+    }
     const classroom = await getDoc(
       doc(db, "classrooms", student.classroom)
     ).then((res) => res.data() as Classroom);

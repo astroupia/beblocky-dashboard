@@ -1,7 +1,7 @@
-import { doc, getFirestore, setDoc } from "firebase/firestore";
+import { Plan } from "@/lib/chapa/plans";
 import firebase_app from '@/lib/firebase/firebase-client';
 import { FirebaseApp } from "firebase/app";
-import { Plan } from "@/lib/chapa/plans";
+import { doc, getFirestore, setDoc } from "firebase/firestore";
 
 
 export async function addSubscription({ userId, plan, yearly, paymentInfo: { email, txRef, verified } }: {

@@ -47,6 +47,7 @@ export default function page() {
   });
   const router = useRouter();
   const [isSignUpLoading, setIsSingUpLoading] = useState(false);
+  const [roleState, setRoleState] = useState("");
   const { courses } = useCourses();
   async function onSubmit(data: SignUpSchema) {
     setIsSingUpLoading(true);
@@ -56,6 +57,13 @@ export default function page() {
       parentId = (await getClassroom(data.classCode)).userId;
       if (!parentId) {
         form.setError("classCode", { message: "Classroom isn't found!" });
+        setIsSingUpLoading(false);
+        return;
+      }
+    }
+    if (role === "school") {
+      if (!data.schoolName) {
+        form.setError("schoolName", { message: "School name is required!" });
         setIsSingUpLoading(false);
         return;
       }
@@ -70,6 +78,7 @@ export default function page() {
               email: user.email,
               name: data.name,
               role: data.role,
+              schoolName: data.schoolName ?? null,
               credit: 0,
             });
             if (data.role === "student") {
@@ -118,7 +127,13 @@ export default function page() {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Select onValueChange={field.onChange} value={field.value}>
+                  <Select
+                    onValueChange={(e) => {
+                      field.onChange(e);
+                      setRoleState(e);
+                    }}
+                    value={field.value}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Choose your role" />
                     </SelectTrigger>
@@ -186,7 +201,7 @@ export default function page() {
               )}
             />
 
-            {form.getValues("role") === "student" && (
+            {roleState === "student" && (
               <FormField
                 control={form.control}
                 name="classCode"
@@ -197,6 +212,25 @@ export default function page() {
                         {...field}
                         placeholder="Class Code"
                         className=" h-10"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            )}
+
+            {roleState === "school" && (
+              <FormField
+                control={form.control}
+                name="schoolName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="School Name"
+                        className=" h-10"
+                        required
                       />
                     </FormControl>
                   </FormItem>

@@ -21,6 +21,7 @@ export const signUpSchema = z
     repeatPassword: z.string({
       required_error: "Please provide repeated password!",
     }),
+    schoolName: z.string().optional(),
     classCode: z.string().optional(),
     terms: z
       .boolean({

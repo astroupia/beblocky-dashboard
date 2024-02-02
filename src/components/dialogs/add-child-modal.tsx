@@ -69,7 +69,7 @@ export function AddChildModal({
           const quota = getPlans(userAccountData?.role ?? "Parent").find(
             (plan) => plan.name === userData?.subscription ?? "Free"
           )?.quota;
-          if (studentsCount >= quota!.studentCount) {
+          if (studentsCount >= quota!?.studentCount) {
             toast({
               title: "You reach the amount of student you add with your plan",
               description:

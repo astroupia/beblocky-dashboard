@@ -50,6 +50,7 @@ function useCourses() {
         );
       })
       .catch((_) => {
+        console.log(_)
         setLoading(false);
         setError(
           "Sorry, we couldn't load our courses due to errors. Try again later."

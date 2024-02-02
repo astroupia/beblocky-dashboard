@@ -175,7 +175,7 @@ export default function page() {
                     <Input
                       {...field}
                       placeholder={
-                        form.getValues("role") === "student"
+                        form.watch("role") === "student"
                           ? "Username"
                           : "Email"
                       }
@@ -186,7 +186,7 @@ export default function page() {
               )}
             />
 
-            {form.getValues("role") === "student" && (
+            {form.watch("role") === "student" && (
               <FormField
                 control={form.control}
                 name="classCode"

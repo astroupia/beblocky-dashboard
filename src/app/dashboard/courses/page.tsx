@@ -10,11 +10,14 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Course } from "@/hooks/user-courses";
+import { useRouter } from "next/navigation";
+import { CourseButton } from "./client";
 
 export default async function CoursesRoute() {
   const courses = await fetch(
     "https://beb-blocky-ide.vercel.app/api/v1/courses"
   ).then(async (res) => (await res.json()) as { courses: Course[] });
+
   return (
     <>
       <Head>
@@ -116,9 +119,7 @@ export default async function CoursesRoute() {
                 </div>
               </CardContent>
               <CardFooter className="flex flex-row justify-between items-center">
-                <div className="rounded-full p-1 bg-gray-100 ml-auto">
-                  <ArrowRight size={24} className="text-ecstasy" />
-                </div>
+                <CourseButton course_id={course._id} />
               </CardFooter>
             </Card>
           ))}

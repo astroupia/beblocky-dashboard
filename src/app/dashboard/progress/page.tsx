@@ -9,7 +9,7 @@ export default async function page() {
   const data = await getDashboardData();
   const school = await getSchools();
   let students: Student[] = [];
-  if (data.role === "student") {
+  if (data?.role === "student") {
     return redirect(`/dashboard/progress/${data.student.userId}`);
   }
   return (
@@ -18,8 +18,8 @@ export default async function page() {
       <div className=" my-4">
         <ProgressTabs
           data={
-            data.role === "parent"
-              ? data.student
+            data?.role === "parent"
+              ? data?.student
               : students.concat(...school!.map((d) => d.students))
           }
         />

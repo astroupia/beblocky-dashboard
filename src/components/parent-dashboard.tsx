@@ -5,12 +5,14 @@ import { AddChildModal } from "./dialogs/add-child-modal";
 import { EmptyPlaceholder } from "./empty-placehoder";
 import { PageHeader } from "./page-header";
 import { StudentCard } from "./student-card";
+import { Course } from "@/hooks/user-courses";
 
 interface Props {
   students: Student[];
+  courses: Course[]
 }
 
-export function ParentDashboard({ students }: Props) {
+export function ParentDashboard({ students, courses }: Props) {
   const { user } = useAuthContext();
   return (
     <div>
@@ -22,7 +24,7 @@ export function ParentDashboard({ students }: Props) {
       {students.length ? (
         <div className=" md:flex items-start gap-2">
           {students.map((student) => (
-            <StudentCard student={student} key={student.name} classrooms={[]} />
+            <StudentCard student={student} key={student.name} classrooms={[]} courses={courses} />
           ))}
         </div>
       ) : (

@@ -1,3 +1,4 @@
+import { COURSE_URL } from "@/lib/constant";
 import { useEffect, useState } from "react";
 
 export interface Slide {
@@ -37,17 +38,15 @@ function useCourses() {
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
+
   useEffect(() => {
     setLoading(true);
-    fetch("https://beb-blocky-ide.vercel.app/api/v1/courses")
+    fetch(COURSE_URL)
       .then((response) => response.json())
       .then((data) => {
+        console.log(data)
         setLoading(false);
         setCourses(data.courses);
-        sessionStorage.setItem(
-          "auth_token",
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NGU3NDcwMzI3ZWFkNDhkODFmYTI2ZTciLCJpYXQiOjE2OTI4Nzg3ODl9.JhKUoZLk9U65iIuG_nosAaFnxm56dS_K3jZv00uQUvk"
-        );
       })
       .catch((_) => {
         console.log(_)

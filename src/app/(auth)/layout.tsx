@@ -4,7 +4,7 @@ import { Tab, Tabs } from "@nextui-org/react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode } from "react";
-import Banner from "../../../public/assets/images/default-register.png";
+import Banner from "../../../public/assets/images/iStock-1278915635.jpg";
 import Logo from "../../../public/assets/images/logo.png";
 interface Props {
   children: ReactNode;
@@ -47,11 +47,18 @@ export default function authLayout({ children }: Props) {
           </div>
         </div>
       </div>
-      <Image
-        src={Banner}
-        alt=""
-        className=" hidden md:block lg:block h-screen w-auto"
-      />
+      <div className="justify-end hidden md:flex">
+        <div className="w-10/12 flex justify-center">
+          <Image
+            src={Banner}
+            alt=""
+            className=" hidden md:block self-center lg:block object-cover bg-center w-auto h-screen"
+            style={{
+              backgroundRepeat: "no-repeat"
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }

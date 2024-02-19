@@ -10,11 +10,14 @@ import { EmptyPlaceholder } from "./empty-placehoder";
 import { PageHeader } from "./page-header";
 import SearchBar from "./search-bar";
 import { StudentCard } from "./student-card";
+import { Course } from "@/hooks/user-courses";
 
 export function SchoolDashboard({
   data,
+  courses
 }: {
   data: { classRoom: Classroom; students: Student[] }[];
+  courses: Course[]
 }) {
   const pathname = usePathname();
   const array: Student[] = [];
@@ -65,6 +68,7 @@ export function SchoolDashboard({
               {students.map((student) => (
                 <StudentCard
                   student={student}
+                  courses={courses}
                   classrooms={data.map((d) => d.classRoom)}
                 />
               ))}

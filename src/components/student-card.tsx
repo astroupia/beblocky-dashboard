@@ -1,6 +1,6 @@
 "use client";
 
-import useCourses from "@/hooks/user-courses";
+import useCourses, { Course } from "@/hooks/user-courses";
 import { Classroom, Student } from "@/types";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
@@ -12,11 +12,12 @@ import { Card, CardContent, CardHeader } from "./ui/card";
 export function StudentCard({
   student,
   classrooms,
+  courses
 }: {
   student: Student;
   classrooms: Classroom[];
+  courses: Course[]
 }) {
-  const { courses } = useCourses();
   return (
     <Card className="rounded-2xl lg:w-1/4 w-full">
       <CardHeader className=" text-white p-6 bg-gradient-to-tr from-lime-600 to-lime-500 rounded-t-2xl">
@@ -34,7 +35,7 @@ export function StudentCard({
       <CardContent>
         <div className=" mt-4 flex items-center justify-between border-b pb-4">
           <p className=" text-sm font-bold">Course</p>
-          <AddCourseModal student={student} />
+          <AddCourseModal student={student} courses={courses} />
         </div>
         <div className=" mt-2 space-y-2">
           {Array.from(new Set(student.courses))?.map((course) => (

@@ -1,4 +1,5 @@
 import { Course } from "@/hooks/user-courses";
+import { COURSE_URL } from "@/lib/constant";
 import firebase_app from "@/lib/firebase/firebase-client";
 import { Classroom, Student, User } from "@/types";
 import { auth } from "firebase-admin";
@@ -54,21 +55,11 @@ export async function getDashboardData() {
     const classroom = await getDoc(
       doc(db, "classrooms", student.classroom)
     ).then((res) => res.data() as Classroom);
-    const courses = await fetch(
-      "https://beb-blocky-ide.vercel.app/api/v1/courses"
-    )
-      .then(async (res) => (await res.json()) as { courses: Course[] })
-      .then((res) => res.courses);
+
     return {
       role: "student" as const,
       student: student,
-      courses: courses
-        .filter((course) => classroom?.courses.includes(course._id.toString()))
-        .concat(
-          courses.filter((course) =>
-            student.courses?.includes(course._id.toString())
-          )
-        ),
+      classroom
     };
   }
   throw "User Doesn't Exist";

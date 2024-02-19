@@ -12,10 +12,11 @@ import {
 import { Course } from "@/hooks/user-courses";
 import { useRouter } from "next/navigation";
 import { CourseButton } from "./client";
+import { COURSE_URL } from "@/lib/constant";
 
 export default async function CoursesRoute() {
   const courses = await fetch(
-    "https://beb-blocky-ide.vercel.app/api/v1/courses"
+    COURSE_URL
   ).then(async (res) => (await res.json()) as { courses: Course[] });
 
   return (

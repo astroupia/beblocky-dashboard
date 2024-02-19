@@ -61,7 +61,7 @@
     "free-solid-svg-icons": "link:/@fortawesome/free-solid-svg-icons",
     "lucide-react": "^0.274.0",
     "nanoid": "^4.0.2",
-    "next": "13.4.19",
+    "next": "14.1.0",
     "nookies": "^2.5.2",
     "postcss": "8.4.29",
     "react": "18.2.0",

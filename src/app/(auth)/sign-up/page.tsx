@@ -35,7 +35,7 @@ import { createStudent } from "@/actions/student";
 import { Loading } from "@/components/loading";
 import { Checkbox } from "@/components/ui/checkbox";
 import useCourses from "@/hooks/user-courses";
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation'
 import { useState } from "react";
 
 const db = app ? getFirestore(app) : undefined;

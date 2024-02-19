@@ -42,11 +42,11 @@ const items: SidebarNavItem[] = [
 
 export default function layout({ children }: Props) {
   return (
-    <main className="grid md:grid-cols-5 min-h-screen ">
+    <main className="grid md:grid-cols-6 min-h-screen ">
       <aside className="hidden h-screen  flex-col md:flex md:sticky md:top-0">
         <SideBar items={items} />
       </aside>
-      <main className=" col-span-4 bg-white border-l rounded-l-3xl md:p-8 md:px-16 p-4">
+      <main className=" col-span-5 bg-white border-l rounded-l-3xl md:p-8 md:px-16 p-4">
         <MobileNav items={items} />
         {children}
       </main>

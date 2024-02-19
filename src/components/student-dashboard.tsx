@@ -4,7 +4,7 @@ import { PageHeader } from "./page-header";
 
 
 export function StudentDashboard({ courses }: { courses: Course[] }) {
-    console.log(courses)
+
     return (
         <div>
             <PageHeader />

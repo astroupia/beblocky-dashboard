@@ -1,5 +1,5 @@
 import { addCourse } from "@/actions/student"
-import useCourses from "@/hooks/user-courses"
+import useCourses, { Course } from "@/hooks/user-courses"
 import { guid } from "@/lib/utils"
 import { Student } from "@/types"
 import { Plus, X } from "lucide-react"
@@ -12,10 +12,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 
 
 
-export const AddCourseModal = ({ student }: { student: Student }) => {
+export const AddCourseModal = ({ student, courses }: { student: Student, courses: Course[] }) => {
     type CourseBox = { id: string, courseId: string | undefined }[]
     const [courseBox, setCourseBox] = useState<CourseBox>(student.courses?.filter(c => c).map((c) => ({ id: guid(), courseId: c })) ?? [])
-    const { courses } = useCourses()
+    // const { courses } = useCourses()
     const router = useRouter()
     async function add(crs: CourseBox) {
         const coursesToAdd = crs.filter(d => d.courseId).map(d => d.courseId!)

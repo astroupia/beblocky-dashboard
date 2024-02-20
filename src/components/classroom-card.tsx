@@ -23,10 +23,9 @@ export function ClassroomCard({ classroom }: { classroom: Classroom }) {
           <EditClassRoomModal classroom={classroom} />
         </div>
         <div className=" flex items-center">
-          <Button size="sm" className="text-xs" variant="secondary">
-            <CopyButton value={classroom.uid} />
-            Copy Class Code
-          </Button>
+          <CopyButton value={classroom.uid}>
+            Copy Classroom ID
+          </CopyButton>
           <div></div>
         </div>
       </CardHeader>
@@ -35,13 +34,13 @@ export function ClassroomCard({ classroom }: { classroom: Classroom }) {
           <div>
             <p className=" text-sm font-bold">Members</p>
           </div>
-          <div
+          {/* <div
             role="button"
             className=" flex items-center gap-2 text-green-700 font-semibold text-xs bg-green-100 p-1 px-2"
           >
             <Plus size={12} />
             Add
-          </div>
+          </div> */}
         </div>
         <div className=" mt-2 space-y-2">
           <p className=" text-sm font-bold">Course</p>

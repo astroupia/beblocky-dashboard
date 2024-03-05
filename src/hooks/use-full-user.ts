@@ -5,7 +5,7 @@ import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
 type UserAccountData = {
-  role: "Parent" | "Student" | "School";
+  role: "parent" | "student" | "school";
   parentId: string;
 };
 const useGetFullUser = () => {
@@ -23,6 +23,7 @@ const useGetFullUser = () => {
           const docSnap = await getDoc(userRef);
           if (docSnap.exists()) {
             const data = docSnap.data();
+            console.log({ data });
             setUserAccountData(data as UserAccountData);
           } else {
             setUserAccountData(undefined);

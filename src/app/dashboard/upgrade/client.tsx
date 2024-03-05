@@ -75,7 +75,7 @@ export const UpgradeTab = () => {
     setIsLoading(false);
     router.push(checkoutUrl);
   }
-  const plans = getPlans(userAccountData?.role ?? "Parent");
+  const plans = getPlans(userAccountData?.role ?? "parent");
   return (
     <Tabs
       aria-label="Options"

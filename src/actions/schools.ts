@@ -41,13 +41,16 @@ export async function getSchools() {
         querySnapshot.docs.map(async (doc) => {
           const studentsQuery = query(
             collection(db, "students"),
-            where("classroom", "==", doc.id)
+            where("classroom", "==", doc.id),
           );
           const studentsSnap = await getDocs(studentsQuery);
           const students = studentsSnap.docs.map(
-            (doc) => ({ ...doc.data() } as Student)
+            (doc) => ({ ...doc.data() }) as Student,
           );
           const classrooms = { ...(doc.data() as Classroom), uid: doc.id };
+          console.log({
+            students
+          })
           return {
             classRoom: classrooms,
             students: students.map((s) => ({
@@ -55,7 +58,7 @@ export async function getSchools() {
               courses: [...s.courses!, ...classrooms.courses],
             })),
           };
-        })
+        }),
       );
       return data;
     }
@@ -67,7 +70,7 @@ export async function getSchools() {
 export const addClass = async (
   userId: string,
   name: string,
-  courses: string[]
+  courses: string[],
 ) => {
   if (!db) {
     throw Error("Db Isn't here");
@@ -84,7 +87,7 @@ export const editClass = async (
   uid: string,
   userId: string,
   name: string,
-  courses: string[]
+  courses: string[],
 ) => {
   if (!db) {
     throw Error("Db Isn't here");

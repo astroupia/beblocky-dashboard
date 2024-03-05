@@ -2,9 +2,9 @@ import { Role } from "@/types";
 
 export const getPlans = (role: Role): Plan[] => {
   role = role.toLowerCase() as Role;
-  const priceMultiplier = role === "Parent" || role === "Student" ? 1 : 10;
+  const priceMultiplier = role === "parent" || role === "student" ? 1 : 10;
   const studentCountMultiplier =
-    role === "Parent" || role === "Student" ? 1 : 10;
+    role === "parent" || role === "student" ? 1 : 10;
   return [
     {
       name: "Free",

@@ -6,7 +6,7 @@ import { Classroom, Student } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Edit3 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAuthContext } from "../context/auth-context";
 import { Loading } from "../loading";
@@ -68,6 +68,7 @@ export const EditChildModal = ({
     });
   }
   const [open, setOpen] = useState(false);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
@@ -111,7 +112,7 @@ export const EditChildModal = ({
                 );
               }}
             />
-            {userAccountData?.role === "School" && (
+            {userAccountData?.role === "school" && (
               <FormField
                 control={form.control}
                 name="classroom"

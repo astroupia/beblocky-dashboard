@@ -33,6 +33,9 @@ export async function createChild({
   classroom: string;
   username: string;
 }) {
+  console.log({
+    email, password, displayName, parentId, classroom, username
+  })
   const createdUser = await auth().createUser({
     email: email,
     emailVerified: false,

@@ -66,7 +66,15 @@ export function AddChildModal({
       open={open}
       onOpenChange={(o) => {
         if (o) {
-          const quota = getPlans(userAccountData?.role ?? "Parent").find(
+          if (!classrooms?.length) {
+            toast({
+              title: "No classroom exist",
+              description:
+                "Please create a classroom before you add a student.",
+            });
+            return
+          }
+          const quota = getPlans(userAccountData?.role ?? "parent").find(
             (plan) => plan.name === userData?.subscription ?? "Free"
           )?.quota;
           if (studentsCount >= quota!?.studentCount) {
@@ -142,7 +150,7 @@ export const AlreadyRegistered = ({
   const [foundUser, setFoundUser] = useState<User>();
   const { userAccountData } = useGetFullUser();
   const { user } = useAuthContext();
-  const name = userAccountData?.role === "School" ? "Student" : "Child";
+  const name = userAccountData?.role === "school" ? "Student" : "Child";
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     try {
@@ -175,7 +183,7 @@ export const AlreadyRegistered = ({
   async function onAddStudent() {
     setIsLoading(true);
     const className =
-      userAccountData?.role === "Parent" ? "Class A" : "Students";
+      userAccountData?.role === "parent" ? "Class A" : "Students";
     try {
       if (!foundUser) throw Error("User not found");
       await createStudent({
@@ -256,7 +264,7 @@ export const RegisterForm = ({
   const { user } = useAuthContext();
   const [isLoading, setIsLoading] = useState(false);
   const { userAccountData } = useGetFullUser();
-  const isParent = userAccountData?.role === "Parent";
+  const isParent = userAccountData?.role === "parent";
   const router = useRouter();
   const form = useForm<AddChildSchema>({
     resolver: zodResolver(addChildSchema),
@@ -267,7 +275,7 @@ export const RegisterForm = ({
   async function onSubmit(data: AddChildSchema) {
     setIsLoading(true);
     const className =
-      userAccountData?.role === "Parent" ? "Class A" : "Students";
+      userAccountData?.role === "parent" ? "Class A" : "Students";
     try {
       await createChild({
         username: data.username,
@@ -357,7 +365,7 @@ export const RegisterForm = ({
           )}
         />
 
-        {userAccountData?.role === "School" && (
+        {userAccountData?.role === "school" && (
           <FormField
             control={form.control}
             name="classroom"

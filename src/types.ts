@@ -38,6 +38,6 @@ export interface School {
   uid: string;
 }
 
-export interface StudentCourse {}
+export interface StudentCourse { }
 
-export type Role = "Parent" | "School" | "Student";
+export type Role = "parent" | "school" | "student";

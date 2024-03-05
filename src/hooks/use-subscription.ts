@@ -26,7 +26,7 @@ const useUserSubscription = () => {
     if (user && userAccountData) {
       const fetchUserSubscription = async () => {
         const userId =
-          userAccountData.role === "Student"
+          userAccountData.role === "student"
             ? userAccountData.parentId
             : user.uid;
         const db = getFirestore(firebase_app as FirebaseApp);

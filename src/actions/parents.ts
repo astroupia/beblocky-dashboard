@@ -35,7 +35,6 @@ export async function getDashboardData() {
       const students = studentsSnap.docs.map(
         (doc) => ({ ...doc.data() } as Student)
       );
-      console.log(students);
       return {
         student: students,
         role: user.role,

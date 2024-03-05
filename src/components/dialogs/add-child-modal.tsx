@@ -66,7 +66,7 @@ export function AddChildModal({
       open={open}
       onOpenChange={(o) => {
         if (o) {
-          if (!classrooms?.length) {
+          if (!classrooms?.length && userAccountData?.role === "school") {
             toast({
               title: "No classroom exist",
               description:

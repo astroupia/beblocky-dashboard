@@ -58,7 +58,7 @@ export function AddChildModal({
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
   const [accountType, setAccountType] = useState<"new" | "existing">();
-  const name = isSchool ? "Student" : "Child";
+  const name = isSchool ? "student" : "Child";
   const { userAccountData } = useGetFullUser();
   const { userData } = useUserSubscription();
   return (

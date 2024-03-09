@@ -71,7 +71,7 @@ export async function createStudent({
     uid: studentId,
     email: studentEmail,
     name: studentName,
-    role: "Student",
+    role: "student",
     credit: 0,
     parentId,
     classId: classroom,
@@ -95,7 +95,7 @@ export const getUserByEmail = async (
   const userRef = doc(db, "users", user.uid);
   const docSnap = (await getDoc(userRef)).data();
   if (docSnap) {
-    if (docSnap.role !== "Student")
+    if (docSnap.role !== "student")
       return {
         error: "The user found associated email isn't student.",
         data: null,

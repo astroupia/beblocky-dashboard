@@ -16,8 +16,13 @@ export const getStudentCourseData = async (uid: string) => {
 };
 
 export const getProgress = async (uid: string) => {
-  const courseData = await getDoc(doc(db, "studentCourses", uid));
-  return courseData.data() as { progress: string };
+  const courseData = (await getDoc(doc(db, "studentCourses", uid))).data();
+  if (!courseData) {
+    return {
+      progress: "0"
+    }
+  }
+  return courseData as { progress: string };
 };
 
 export const addProgress = async (uid: string, progress: number) => {

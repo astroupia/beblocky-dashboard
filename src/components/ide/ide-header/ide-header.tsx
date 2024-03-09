@@ -44,14 +44,14 @@ const IdePageHeader: React.FC = () => {
             <Image
               src={Logo}
               alt="BeBlocky Logo"
-              className={cn(styles["header-image"], "h-16 w-32")}
+              className={cn(styles["header-image"], "h-24 w-24")}
             />
           )}
           {isNight && (
             <Image
               src={Logo}
               alt="BeBlocky Logo"
-              className={cn(styles["header-image"], "h-16 w-32")}
+              className={cn(styles["header-image"], "h-24 w-24")}
             />
           )}
         </Link>
@@ -113,7 +113,7 @@ const SettingMenu: React.FC = () => {
   // Use the SettingContext to access the context values
   const { setting, setSetting } = useContext(SettingContext) || {
     setting: defaultSetting,
-    setSetting: () => {},
+    setSetting: () => { },
   };
 
   const { fontSize, theme } = setting; // Access the values from the context

@@ -120,7 +120,10 @@ export default async function CoursesRoute() {
                   <p className="mt-2">4.7 Rating</p>
                 </div>
               </CardContent>
-              <CardFooter className="flex flex-row items-center justify-between">
+              <CardFooter>
+
+              </CardFooter>
+              {/* <CardFooter className="flex flex-row items-center justify-between">
                 <Link
                   role="button"
                   className="ml-auto rounded-full bg-gray-100 p-1"
@@ -128,7 +131,7 @@ export default async function CoursesRoute() {
                 >
                   <ArrowRight size={24} className="text-ecstasy" />
                 </Link>
-              </CardFooter>
+              </CardFooter> */}
             </Card>
           ))}
         </div>

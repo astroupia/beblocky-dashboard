@@ -233,6 +233,7 @@ export default function SignUpForm() {
                 <FormItem>
                   <FormControl>
                     <Input
+                      type="text"
                       placeholder="Name"
                       className="shadow-sm"
                       {...field}
@@ -251,7 +252,7 @@ export default function SignUpForm() {
                     <Input
                       type="email"
                       placeholder="Email"
-                      className="shadow-sm"
+                      className="rounded-xl shadow-sm"
                       {...field}
                     />
                   </FormControl>

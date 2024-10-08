@@ -8,7 +8,17 @@ const Dialog = DialogPrimitive.Root;
 
 const DialogTrigger = DialogPrimitive.Trigger;
 
-const DialogPortal = DialogPrimitive.Portal;
+// Remove the custom DialogPortal component
+// const DialogPortal = DialogPrimitive.Portal;
+// DialogPortal.displayName = DialogPrimitive.Portal.displayName;
+
+// Replace with this new DialogPortal component
+const DialogPortal = ({
+  children,
+  ...props
+}: DialogPrimitive.DialogPortalProps) => (
+  <DialogPrimitive.Portal {...props}>{children}</DialogPrimitive.Portal>
+);
 DialogPortal.displayName = DialogPrimitive.Portal.displayName;
 
 const DialogOverlay = React.forwardRef<

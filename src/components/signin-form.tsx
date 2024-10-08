@@ -54,6 +54,7 @@ export default function SignInForm() {
             <FormItem>
               <FormControl>
                 <Input
+                  type="email"
                   placeholder="Email"
                   className="rounded-xl shadow-sm"
                   {...field}

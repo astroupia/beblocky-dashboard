@@ -249,6 +249,7 @@ export default function SignUpForm() {
                 <FormItem>
                   <FormControl>
                     <Input
+                      type="email"
                       placeholder="Email"
                       className="shadow-sm"
                       {...field}

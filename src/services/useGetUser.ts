@@ -1,8 +1,8 @@
 import { useAuthContext } from "@/components/AuthContext";
 import { useEffect, useState } from "react";
-import { getFirestore, doc, getDoc, DocumentData } from 'firebase/firestore';
-import firebase_app from '@/lib/firebaseClient';
-import { FirebaseApp } from 'firebase/app';
+import { getFirestore, doc, getDoc, DocumentData } from "firebase/firestore";
+import firebase_app from "@/lib/firebaseClient";
+import { FirebaseApp } from "firebase/app";
 
 const useGetUser = () => {
   const { user } = useAuthContext();
@@ -19,7 +19,7 @@ const useGetUser = () => {
           const docSnap = await getDoc(userRef);
 
           if (docSnap.exists()) {
-            const data = docSnap.data(); 
+            const data = docSnap.data();
             setUserAccountData(data);
           } else {
             setUserAccountData(undefined);
@@ -31,12 +31,14 @@ const useGetUser = () => {
         }
       };
 
-      fetchUserAccountData();
+      fetchUserAccountData().catch((error) => {
+        console.error("Failed to fetch user account data:", error);
+      });
     } else {
       setLoading(false);
       setUserAccountData(undefined);
     }
-  }, [user]); 
+  }, [user]);
 
   return { userAccountData, isLoading };
 };

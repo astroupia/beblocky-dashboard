@@ -8,10 +8,7 @@ const Dialog = DialogPrimitive.Root;
 
 const DialogTrigger = DialogPrimitive.Trigger;
 
-const DialogPortal = ({
-  // Remove the className from the destructuring
-  ...props
-}: DialogPrimitive.DialogPortalProps) => <DialogPrimitive.Portal {...props} />;
+const DialogPortal = DialogPrimitive.Portal;
 DialogPortal.displayName = DialogPrimitive.Portal.displayName;
 
 const DialogOverlay = React.forwardRef<

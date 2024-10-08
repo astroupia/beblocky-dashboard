@@ -15,6 +15,7 @@ const DialogTrigger = DialogPrimitive.Trigger;
 // Replace with this new DialogPortal component
 const DialogPortal = ({
   children,
+  className,
   ...props
 }: DialogPrimitive.DialogPortalProps) => (
   <DialogPrimitive.Portal {...props}>{children}</DialogPrimitive.Portal>

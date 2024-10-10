@@ -8,6 +8,7 @@ type UserAccountData = {
   role: "parent" | "student" | "school";
   parentId: string;
 };
+
 const useGetFullUser = () => {
   const { user } = useAuthContext();
   const [userAccountData, setUserAccountData] = useState<UserAccountData>();

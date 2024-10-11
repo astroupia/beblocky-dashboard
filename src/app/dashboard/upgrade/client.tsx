@@ -83,9 +83,9 @@ export const UpgradeTab = () => {
       size="lg"
       radius="full"
       classNames={{
-        tabList: "bg-brand-green rounded-full w-full",
+        tabList: "bg-apple rounded-full w-full",
         tabContent:
-          "group-data-[selected=true]:text-[#68b946] text-[#ffffff] font-bold md:text-xl px-4",
+          "group-data-[selected=true]:text-apple text-[#ffffff] font-bold md:text-xl px-4",
       }}
       onSelectionChange={(key) => setIsYearly(key === "yearly")}
     >

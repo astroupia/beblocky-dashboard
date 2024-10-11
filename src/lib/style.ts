@@ -1,5 +1,5 @@
-
 export const tabStyle = {
-    tabList: "bg-brand-green rounded-full w-full",
-    tabContent: "group-data-[selected=true]:text-[#68b946] text-[#ffffff] font-bold md:text-xl px-4",
-}
+  tabList: "bg-[#892FFF] rounded-full w-full",
+  tabContent:
+    "group-data-[selected=true]:text-[#892FFF] text-[#ffffff] font-bold md:text-xl px-4",
+};

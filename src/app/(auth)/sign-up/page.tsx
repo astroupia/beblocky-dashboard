@@ -35,7 +35,7 @@ import { createStudent } from "@/actions/student";
 import { Loading } from "@/components/loading";
 import { Checkbox } from "@/components/ui/checkbox";
 import useCourses from "@/hooks/user-courses";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const db = app ? getFirestore(app) : undefined;
@@ -49,6 +49,8 @@ export default function page() {
   const [isSignUpLoading, setIsSingUpLoading] = useState(false);
   const [roleState, setRoleState] = useState("");
   const { courses } = useCourses();
+  const [classCode, setclassCode] = useState(false);
+
   async function onSubmit(data: SignUpSchema) {
     setIsSingUpLoading(true);
     const { email, password, role } = data;
@@ -190,9 +192,7 @@ export default function page() {
                     <Input
                       {...field}
                       placeholder={
-                        form.watch("role") === "student"
-                          ? "Username"
-                          : "Email"
+                        form.watch("role") === "student" ? "Username" : "Email"
                       }
                       className=" h-10"
                     />
@@ -202,21 +202,59 @@ export default function page() {
             />
 
             {form.watch("role") === "student" && (
-              <FormField
-                control={form.control}
-                name="classCode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Class Code"
-                        className=" h-10"
-                      />
-                    </FormControl>
-                  </FormItem>
+              <>
+                <FormField
+                  control={form.control}
+                  name="classCode"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Do you have a class code?</FormLabel>
+                      <FormControl>
+                        <div className="flex space-x-2">
+                          <Button
+                            type="button"
+                            variant={classCode ? "default" : "outline"}
+                            onClick={() => {
+                              setclassCode(true);
+                              // field.onChange(true);
+                            }}
+                          >
+                            Yes
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={!classCode ? "default" : "outline"}
+                            onClick={() => {
+                              setclassCode(false);
+                              field.onChange(false);
+                              form.setValue("classCode", "");
+                            }}
+                          >
+                            No
+                          </Button>
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                {classCode && (
+                  <FormField
+                    control={form.control}
+                    name="classCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Enter Class Code"
+                            className="h-10"
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
                 )}
-              />
+              </>
             )}
 
             {roleState === "school" && (

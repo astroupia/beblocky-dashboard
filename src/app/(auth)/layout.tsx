@@ -54,7 +54,7 @@ export default function authLayout({ children }: Props) {
             alt=""
             className=" hidden md:block self-center lg:block object-cover bg-center w-auto h-screen"
             style={{
-              backgroundRepeat: "no-repeat"
+              backgroundRepeat: "no-repeat",
             }}
           />
         </div>

@@ -30,12 +30,17 @@ export async function createChild({
   password: string;
   displayName: string;
   parentId: string;
-  classroom: string;
+  classroom?: string;
   username: string;
 }) {
   console.log({
-    email, password, displayName, parentId, classroom, username
-  })
+    email,
+    password,
+    displayName,
+    parentId,
+    classroom,
+    username,
+  });
   const createdUser = await auth().createUser({
     email: email,
     emailVerified: false,
@@ -61,7 +66,7 @@ export async function createStudent({
   studentUsername,
 }: {
   parentId: string;
-  classroom: string;
+  classroom?: string;
   studentId: string;
   studentEmail: string;
   studentName: string;

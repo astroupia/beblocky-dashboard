@@ -37,6 +37,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import useCourses from "@/hooks/user-courses";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useEffect } from "react"; // Add this import for useEffect
 
 const db = app ? getFirestore(app) : undefined;
 
@@ -52,17 +53,28 @@ export default function page() {
   const [classCode, setclassCode] = useState(false);
 
   async function onSubmit(data: SignUpSchema) {
+    console.log("Email being submitted:", data.email); // Log the email
     setIsSingUpLoading(true);
     const { email, password, role } = data;
     let parentId = "";
+    let classroomId = data.classCode || ""; // Use classCode if provided
+
     if (data.classCode) {
-      parentId = (await getClassroom(data.classCode)).userId;
-      if (!parentId) {
+      const classroom = await getClassroom(data.classCode);
+      if (!classroom || !classroom.userId) {
         form.setError("classCode", { message: "Classroom isn't found!" });
         setIsSingUpLoading(false);
         return;
       }
+      parentId = classroom.userId; // Now safe to access userId
     }
+
+    // Allow creating a student without classCode and parentId
+    if (role === "student" && !data.classCode) {
+      parentId = ""; // No parent association
+      classroomId = "12"; // No classroom association
+    }
+
     if (role === "school") {
       if (!data.schoolName) {
         form.setError("schoolName", { message: "School name is required!" });
@@ -84,17 +96,16 @@ export default function page() {
               credit: 0,
             });
             if (data.role === "student") {
-              if (!data.classCode) {
-                throw Error("Classroom isn't provided");
-              }
+              console.log("Trying To Create Student");
               await createStudent({
                 parentId,
-                classroom: data.classCode,
+                classroom: classroomId,
                 studentUsername: data.email.replace("@beblocky.com", ""),
                 studentId: user.uid,
                 studentEmail: data.email as string,
                 studentName: data.name as string,
               });
+              console.log("Student Created!");
             }
           }
           router.push("/dashboard");
@@ -191,10 +202,9 @@ export default function page() {
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder={
-                        form.watch("role") === "student" ? "Username" : "Email"
-                      }
-                      className=" h-10"
+                      placeholder="Email"
+                      className="h-10"
+                      type="email" // Ensure the type is set to email
                     />
                   </FormControl>
                 </FormItem>
@@ -226,8 +236,8 @@ export default function page() {
                             variant={!classCode ? "default" : "outline"}
                             onClick={() => {
                               setclassCode(false);
-                              field.onChange(false);
-                              form.setValue("classCode", "");
+                              field.onChange(""); // Clear the classCode field
+                              form.setValue("classCode", ""); // Ensure the form value is cleared
                             }}
                           >
                             No

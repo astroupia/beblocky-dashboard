@@ -20,7 +20,10 @@ export function StudentDashboard({ courses }: { courses: Course[] }) {
 
   return (
     <div>
-      <PageHeader />
+      <PageHeader
+        showAddClassCodeBtn={true} // Show the button for students
+        onAddClassCodeClick={handleOpenDialog} // Pass the click handler
+      />
       <div className="flex flex-col py-4 gap-2">
         <h3 className="text-3xl font-bold">Your Courses</h3>
         {courses.length === 0 ? (
@@ -35,12 +38,6 @@ export function StudentDashboard({ courses }: { courses: Course[] }) {
             <CourseCard key={course._id} course={course} progress />
           ))}
         </div>
-        {/* Button to open Class Code Dialog */}
-        {
-          <Button onClick={handleOpenDialog} variant="outline">
-            Add Class Code
-          </Button>
-        }
       </div>
       <ClassCodeDialog isOpen={isDialogOpen} onClose={handleCloseDialog} />
     </div>

@@ -154,7 +154,8 @@ export const addCourse = async (studentId: string, courses: string[]) => {
         console.error("Invalid studentId:", studentId);
         return; // Skip if studentId is invalid
       }
-      setDoc(doc(db, "studentCourses", studentId), {
+      setDoc(doc(db, "studentCourses", studentId, course), {
+        // Ensure this path is valid
         courseId: course,
         progress: 0,
         slideIndex: 0,

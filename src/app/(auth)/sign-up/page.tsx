@@ -71,8 +71,8 @@ export default function page() {
 
     // Allow creating a student without classCode and parentId
     if (role === "student" && !data.classCode) {
-      parentId = ""; // No parent association
-      classroomId = "h2mqXKWeII32vWR3OoZR"; // No classroom association
+      parentId = "G1iJCsv6HxXngJeAVSYzwHsXW0H2"; // if No parent association
+      classroomId = "h2mqXKWeII32vWR3OoZR"; // if No classroom association
     }
 
     if (role === "school") {

@@ -4,7 +4,6 @@ import * as React from "react";
 
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogFooter,
@@ -35,54 +34,45 @@ export function ClassCodeDialog({ isOpen, onClose }: ClassCodeDialogProps) {
   const onSubmit = async (data: { classCode: string }) => {
     const classroom = await getClassroom(data.classCode);
     if (!classroom || !classroom.userId) {
-      // Check for classroom.userId only
       toast({ title: "Classroom not found!", variant: "destructive" });
       return;
     }
 
-    // Get the current user's email using Firebase authentication
     const auth = getAuth();
-    const user = auth.currentUser; // Get the current user
+    const user = auth.currentUser;
     if (!user) {
       toast({ title: "User not authenticated!", variant: "destructive" });
       return;
     }
 
-    // Fetch the user details using the email from the Firebase user
-    const userResponse = await getUserByEmail(user.email!, data.classCode); // {{ edit_1 }}: Pass the classCode to getUserByEmail
+    const userResponse = await getUserByEmail(user.email!, data.classCode); // {{ edit_1 }}
     if ("error" in userResponse) {
       toast({ title: userResponse.error, variant: "destructive" });
       return;
     }
 
-    // Ensure userResponse.data is not null before accessing its properties
     if (!userResponse.data) {
       toast({ title: "User data not found!", variant: "destructive" });
       return;
     }
 
-    const studentId = userResponse.data.uid; // Assuming uid is the studentId
-    const parentId = classroom.userId; // The parentId is the userId from the classroom
+    const studentId = userResponse.data.uid;
+    const parentId = classroom.userId;
     await createStudent({
-      // Call createStudent to update the student record
       parentId,
-      classroom: data.classCode, // Use the entered class code as the classId
+      classroom: data.classCode,
       studentId,
-      studentName: userResponse.data.displayName || "", // Provide a default value if displayName is null
-      studentEmail: userResponse.data.email || "", // Provide a default value if email is null
-      studentUsername: "", // Set to an empty string or provide a default value
+      studentName: userResponse.data.displayName || "",
+      studentEmail: userResponse.data.email || "",
+      studentUsername: "",
     });
 
     toast({ title: "Class code accepted!", variant: "default" });
-    onClose(); // Call onClose immediately after the toast
+    onClose();
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogTrigger asChild>
-        <Button variant="outline">Enter Class Code</Button>
-      </DialogTrigger>
-
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="mb-2">Enter Class Code</DialogTitle>

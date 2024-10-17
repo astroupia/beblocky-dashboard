@@ -14,9 +14,20 @@ export default async function page() {
   if (!data) {
     return redirect("/");
   }
-  const courses = await fetch(COURSE_URL)
-    .then(async (res) => (await res.json()) as { courses: Course[] })
-    .then((res) => res.courses);
+
+  let courses: Course[] = [];
+  try {
+    const response = await fetch(COURSE_URL);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const json = await response.json();
+    courses = json.courses; // Assuming the response has a 'courses' field
+  } catch (error) {
+    console.error("Failed to fetch courses:", error);
+    // Handle the error as needed, e.g., set courses to an empty array or show a message
+  }
+
   return (
     <div>
       <SubscriptionModal />

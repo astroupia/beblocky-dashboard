@@ -76,6 +76,7 @@
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.2.2",
+    "undici": "5.28.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -84,6 +85,11 @@
     "ts-jest": "^29.2.5"
   },
   "resolutions": {
-    "undici": "6.20.1"
+    "undici": "6.18.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "undici": "5.28.4"
+    }
   }
 }

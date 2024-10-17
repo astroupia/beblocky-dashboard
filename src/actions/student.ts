@@ -13,6 +13,7 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
+import { addSubscription } from "@/actions/subscription"; // Import the addSubscription function
 
 customInitApp();
 
@@ -91,6 +92,30 @@ export async function createStudent({
     userId: studentId,
     userName: studentUsername,
   });
+
+  // Check if the student is created without a class code and parentId
+  if (!classroom && !parentId) {
+    // Automatically assign a free subscription
+    await addSubscription({
+      userId: studentId,
+      plan: {
+        name: "Free Plan",
+        price: {
+          monthly: 0,
+          yearly: 0,
+        },
+        quota: {
+          studentCount: 0,
+        },
+        description: "Access to basic features",
+      },
+      paymentInfo: {
+        txRef: "auto-generated-ref", // You can generate a unique reference here
+        email: studentEmail,
+        verified: true, // Set to true if you want to mark it as verified
+      },
+    });
+  }
 }
 
 export const getUserByEmail = async (

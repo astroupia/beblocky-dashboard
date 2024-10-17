@@ -55,7 +55,7 @@
     "cmdk": "^0.2.1",
     "date-fns": "^2.30.0",
     "encoding": "^0.1.13",
-    "firebase": "^10.14.1",
+    "firebase": "^10.14.0",
     "firebase-admin": "^11.11.1",
     "framer-motion": "^10.18.0",
     "free-solid-svg-icons": "link:/@fortawesome/free-solid-svg-icons",

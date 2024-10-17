@@ -54,11 +54,10 @@ export async function getDashboardData() {
     const classroom = await getDoc(
       doc(db, "classrooms", student.classroom)
     ).then((res) => res.data() as Classroom);
-
     return {
       role: "student" as const,
       student: student,
-      classroom
+      classroom,
     };
   }
   throw "User Doesn't Exist";

@@ -75,11 +75,13 @@ export function AddChildModal({
             return;
           }
           const quota = getPlans(userAccountData?.role ?? "parent").find(
-            (plan) => plan.name === userData?.subscription ?? "Free"
+            (plan) =>
+              plan.name === userData?.subscription || plan.name === "Free"
           )?.quota;
-          if (studentsCount >= quota!?.studentCount) {
+          if (quota?.studentCount && studentsCount >= quota.studentCount) {
             toast({
-              title: "You reach the amount of student you add with your plan",
+              title:
+                "You have reached the maximum number of students allowed by your plan",
               description:
                 "Please upgrade your package to access more features",
             });
@@ -158,7 +160,10 @@ export const AlreadyRegistered = ({
         setIsLoading(true);
         const validate = z.string().email();
         validate.parse(email);
-        const user = await getUserByEmail(email);
+        const user = await getUserByEmail(
+          email,
+          userAccountData?.role ?? "parent"
+        );
         if (!user.data) {
           setIsLoading(false);
           return toast({

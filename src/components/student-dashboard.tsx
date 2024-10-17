@@ -36,9 +36,11 @@ export function StudentDashboard({ courses }: { courses: Course[] }) {
           ))}
         </div>
         {/* Button to open Class Code Dialog */}
-        <Button onClick={handleOpenDialog} variant="outline">
-          Add Class Code
-        </Button>
+        {
+          <Button onClick={handleOpenDialog} variant="outline">
+            Add Class Code
+          </Button>
+        }
       </div>
       <ClassCodeDialog isOpen={isDialogOpen} onClose={handleCloseDialog} />
     </div>

@@ -14,9 +14,7 @@ export default async function page() {
   if (!data) {
     return redirect("/");
   }
-  const courses = await fetch(
-    COURSE_URL
-  )
+  const courses = await fetch(COURSE_URL)
     .then(async (res) => (await res.json()) as { courses: Course[] })
     .then((res) => res.courses);
   return (
@@ -27,12 +25,17 @@ export default async function page() {
       ) : data.role === "school" ? (
         <SchoolDashboard data={school ?? []} courses={courses ?? []} />
       ) : (
-        <StudentDashboard courses={courses.filter((course) => data.classroom?.courses.includes(course._id.toString()))
-          .concat(
-            courses.filter((course) =>
-              data.student.courses?.includes(course._id.toString())
+        <StudentDashboard
+          courses={courses
+            .filter((course) =>
+              data.classroom?.courses.includes(course._id.toString())
             )
-          )} />
+            .concat(
+              courses.filter((course) =>
+                data.student.courses?.includes(course._id.toString())
+              )
+            )}
+        />
       )}
     </div>
   );

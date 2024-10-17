@@ -94,7 +94,8 @@ export async function createStudent({
 }
 
 export const getUserByEmail = async (
-  email: string
+  email: string,
+  newClassCode: string // {{ edit_1 }}: Added parameter for dynamic class code
 ): Promise<{ error: string; data: null } | { data: User }> => {
   const user = await auth().getUserByEmail(email);
   const userRef = doc(db, "users", user.uid);
@@ -107,6 +108,12 @@ export const getUserByEmail = async (
       };
     if (docSnap.parentId)
       return { error: "Already assigned to another class!", data: null };
+
+    // {{ edit_2 }}
+    if (docSnap.classId === "12") {
+      await updateDoc(userRef, { classId: newClassCode }); // Use the dynamic parameter
+    }
+    // {{ edit_3 }}
   }
   return { data: user.toJSON() as User };
 };
@@ -118,6 +125,10 @@ export const addCourse = async (studentId: string, courses: string[]) => {
 
   await Promise.allSettled(
     courses.map((course) => {
+      if (!studentId) {
+        console.error("Invalid studentId:", studentId);
+        return; // Skip if studentId is invalid
+      }
       setDoc(doc(db, "studentCourses", studentId), {
         courseId: course,
         progress: 0,

@@ -42,7 +42,7 @@ export function SideBar({ items }: Props) {
         {items.map((item) => {
           const Icon = Icons[item.icon];
           return (
-            <Link href={item.href}>
+            <Link key={item.href} href={item.href}>
               <span
                 className={cn(
                   " hover:text-accent-foreground transition-all duration-250 group flex items-center px-8 py-2 text-sm font-medium",

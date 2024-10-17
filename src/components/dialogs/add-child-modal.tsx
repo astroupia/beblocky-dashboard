@@ -72,7 +72,7 @@ export function AddChildModal({
               description:
                 "Please create a classroom before you add a student.",
             });
-            return
+            return;
           }
           const quota = getPlans(userAccountData?.role ?? "parent").find(
             (plan) => plan.name === userData?.subscription ?? "Free"

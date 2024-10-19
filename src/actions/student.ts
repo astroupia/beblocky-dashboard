@@ -94,33 +94,42 @@ export async function createStudent({
   });
 
   // Check if the student is created without a class code and parentId
-  if (!classroom && !parentId) {
-    // Automatically assign a free subscription
-    await addSubscription({
-      userId: studentId,
-      plan: {
-        name: "Free Plan",
-        price: {
-          monthly: 0,
-          yearly: 0,
+  if (!parentId) {
+    // Ensure userId is valid before calling addSubscription
+    if (studentId) {
+      // Automatically assign a free subscription
+      await addSubscription({
+        userId: studentId,
+        plan: {
+          name: "Free",
+          price: {
+            monthly: 0,
+            yearly: 0,
+          },
+          quota: {
+            studentCount: 0,
+          },
+          description: "Access to basic features",
         },
-        quota: {
-          studentCount: 0,
+        paymentInfo: {
+          txRef: "auto-generated-ref", // You can generate a unique reference here
+          email: studentEmail,
+          verified: true, // Set to true if you want to mark it as verified
         },
-        description: "Access to basic features",
-      },
-      paymentInfo: {
-        txRef: "auto-generated-ref", // You can generate a unique reference here
-        email: studentEmail,
-        verified: true, // Set to true if you want to mark it as verified
-      },
-    });
+      });
+
+      // {{ edit_1 }}: Assign the course after subscription
+      // const coursesToAssign = ["64c6bf88588e55011314a3c3"]; // {{ edit_2 }}: Changed to an array
+      // await addCourse(studentId, coursesToAssign); // Assign the courses
+    } else {
+      console.error("Cannot create subscription: Invalid studentId.");
+    }
   }
 }
 
 export const getUserByEmail = async (
   email: string,
-  newClassCode: string // {{ edit_1 }}: Added parameter for dynamic class code
+  newClassCode: string // {{ edit_2 }}: Added parameter for dynamic class code
 ): Promise<{ error: string; data: null } | { data: User }> => {
   const user = await auth().getUserByEmail(email);
   const userRef = doc(db, "users", user.uid);
@@ -134,11 +143,11 @@ export const getUserByEmail = async (
     if (docSnap.parentId)
       return { error: "Already assigned to another class!", data: null };
 
-    // {{ edit_2 }}
+    // {{ edit_3 }}
     if (docSnap.classId === "12") {
       await updateDoc(userRef, { classId: newClassCode }); // Use the dynamic parameter
     }
-    // {{ edit_3 }}
+    // {{ edit_4 }}
   }
   return { data: user.toJSON() as User };
 };

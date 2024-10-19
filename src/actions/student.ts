@@ -140,11 +140,11 @@ export const getUserByEmail = async (
         error: "The user found associated email isn't student.",
         data: null,
       };
-    if (docSnap.parentId)
-      return { error: "Already assigned to another class!", data: null };
+    // if (docSnap.parentId)
+    //   return { error: "Already assigned to another class!", data: null };
 
     // {{ edit_3 }}
-    if (docSnap.classId === "PhldhtU6vVDeTMej1Ub8") {
+    if (docSnap.classroom === "PhldhtU6vVDeTMej1Ub8") {
       await updateDoc(userRef, { classId: newClassCode }); // Use the dynamic parameter
     }
     // {{ edit_4 }}

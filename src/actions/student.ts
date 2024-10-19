@@ -144,7 +144,7 @@ export const getUserByEmail = async (
       return { error: "Already assigned to another class!", data: null };
 
     // {{ edit_3 }}
-    if (docSnap.classId === "12") {
+    if (docSnap.classId === "PhldhtU6vVDeTMej1Ub8") {
       await updateDoc(userRef, { classId: newClassCode }); // Use the dynamic parameter
     }
     // {{ edit_4 }}

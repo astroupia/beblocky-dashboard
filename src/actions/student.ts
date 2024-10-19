@@ -101,7 +101,7 @@ export async function createStudent({
       await addSubscription({
         userId: studentId,
         plan: {
-          name: "Free Plan",
+          name: "Free",
           price: {
             monthly: 0,
             yearly: 0,

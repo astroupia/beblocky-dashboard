@@ -45,9 +45,7 @@ export function StudentDashboard({ courses }: { courses: Course[] }) {
                   .then((response) => response.json())
                   .then((data) => {
                     const course = data.courses.find(
-                      (c: Course) =>
-                        c.courseTitle ===
-                        "HTML Course 1 (Creating a Profile Website)"
+                      (c: Course) => c.courseLanguage === "html"
                     );
                     setFreeCourse(course || null);
                   })

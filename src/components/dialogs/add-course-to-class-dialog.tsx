@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -38,10 +39,10 @@ export function AddCourseToClassDialog({
   isOpen,
   onClose,
 }: AddCourseToClassDialogProps) {
+  const router = useRouter();
   const [selectedClass, setSelectedClass] = useState("");
 
   const handleSubmit = async () => {
-    console.log("in handle submit", selectedClass, course._id);
     if (!selectedClass) {
       toast({
         title: "Please select a class",
@@ -53,11 +54,11 @@ export function AddCourseToClassDialog({
     try {
       const result = await addCourseToClass(selectedClass, course._id);
       if (result.success) {
-        console.log("in handle submit", selectedClass, course._id);
         toast({
           title: "Course added to class successfully!",
         });
         onClose();
+        router.refresh();
       } else {
         throw result.error || "Failed to add course to class";
       }
@@ -68,7 +69,6 @@ export function AddCourseToClassDialog({
       });
     }
   };
-  console.log("Dialog rendered");
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>

@@ -21,7 +21,7 @@ import { useEffect, useState } from "react";
 import { CourseDetailDialog } from "@/components/dialogs/course-detail-dialog";
 import { AddCourseToClassDialog } from "@/components/dialogs/add-course-to-class-dialog";
 import { useAuthContext } from "@/components/context/auth-context";
-import { getClassrooms, getDashboardData } from "@/actions/parents";
+import { getClassroomsByUserId, getDashboardData } from "@/actions/parents";
 import { Loading } from "@/components/loading"; // Create this if you haven't
 
 interface CoursesClientProps {
@@ -56,15 +56,17 @@ export function CoursesClient({ courses }: CoursesClientProps) {
     fetchData();
   }, [user]);
 
-  // Second useEffect for classrooms
+  // Modified useEffect for classrooms
   useEffect(() => {
     const fetchClassrooms = async () => {
-      const classroomsData = await getClassrooms();
-      setClassrooms(classroomsData as any);
+      if (user?.uid) {
+        const classroomsData = await getClassroomsByUserId(user.uid);
+        setClassrooms(classroomsData as any);
+      }
     };
 
     fetchClassrooms();
-  }, []);
+  }, [user]); // Add user as dependency
 
   if (loading) {
     return <Loading />;

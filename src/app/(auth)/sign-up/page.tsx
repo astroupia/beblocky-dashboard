@@ -24,6 +24,7 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   updateProfile,
+  sendEmailVerification,
 } from "firebase/auth";
 import { doc, getFirestore, setDoc } from "firebase/firestore";
 import { School2, User, Users } from "lucide-react";
@@ -38,6 +39,7 @@ import useCourses from "@/hooks/user-courses";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useEffect } from "react"; // Add this import for useEffect
+import { PasswordInput } from "@/components/ui/password-input";
 
 const db = app ? getFirestore(app) : undefined;
 
@@ -85,6 +87,7 @@ export default function page() {
     try {
       await createUserWithEmailAndPassword(auth, email, password).then(
         async ({ user }) => {
+          await sendEmailVerification(user);
           await updateProfile(user, { displayName: data.name });
           if (db) {
             await setDoc(doc(db, "users", user.uid), {
@@ -94,6 +97,7 @@ export default function page() {
               role: data.role,
               schoolName: data.schoolName ?? null,
               credit: 0,
+              emailVerified: false,
             });
             if (data.role === "student") {
               console.log("Trying To Create Student");
@@ -108,7 +112,11 @@ export default function page() {
               console.log("Student Created!");
             }
           }
-          router.push("/dashboard");
+          toast({
+            title: "Account created successfully!",
+            description: "Please check your email to verify your account.",
+          });
+          router.push("/sign-in");
         }
       );
     } catch (error: any) {
@@ -292,14 +300,10 @@ export default function page() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input
+                    <PasswordInput
                       {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                      }}
                       placeholder="Password"
-                      type="password"
-                      className=" h-10"
+                      className="h-10"
                     />
                   </FormControl>
                 </FormItem>
@@ -311,11 +315,10 @@ export default function page() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input
+                    <PasswordInput
                       {...field}
                       placeholder="Repeat Password"
-                      type="password"
-                      className=" h-10"
+                      className="h-10"
                     />
                   </FormControl>
                 </FormItem>

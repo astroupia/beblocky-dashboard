@@ -72,10 +72,6 @@ export function CoursesClient({ courses }: CoursesClientProps) {
     return <Loading />;
   }
 
-  if (!user || !userData) {
-    return <div>Please sign in to view courses</div>;
-  }
-
   const isTeacherOrParent =
     userData?.role === "school" || userData?.role === "parent";
 

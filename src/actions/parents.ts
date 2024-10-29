@@ -1,3 +1,5 @@
+"use server";
+
 import { Course } from "@/hooks/user-courses";
 import { COURSE_URL } from "@/lib/constant";
 import firebase_app from "@/lib/firebase/firebase-client";
@@ -11,6 +13,8 @@ import {
   getFirestore,
   query,
   where,
+  updateDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import { cookies } from "next/headers";
 
@@ -61,4 +65,70 @@ export async function getDashboardData() {
     };
   }
   throw "User Doesn't Exist";
+}
+
+export async function addCourseToClass(classroomId: string, courseId: number) {
+  try {
+    const db = firebase_app ? getFirestore(firebase_app) : undefined;
+    if (!db) {
+      throw "Database doesn't exist";
+    }
+
+    const classroomRef = doc(db, "classrooms", classroomId);
+    await updateDoc(classroomRef, {
+      courses: arrayUnion(courseId),
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error adding course to class:", error);
+    return { error: "Failed to add course to class" };
+  }
+}
+
+export async function getClassrooms() {
+  try {
+    const db = firebase_app ? getFirestore(firebase_app) : undefined;
+    if (!db) {
+      throw "Database doesn't exist";
+    }
+
+    const classroomsSnap = await getDocs(collection(db, "classrooms"));
+    const classrooms = classroomsSnap.docs.map((doc) => ({
+      id: doc.id,
+      name: doc.data().name,
+      courses: doc.data().courses || [],
+      userId: doc.data().userId,
+    }));
+
+    return classrooms;
+  } catch (error) {
+    console.error("Error retrieving classrooms:", error);
+    return [];
+  }
+}
+
+export async function getClassroomsByUserId(userId: string) {
+  try {
+    const db = firebase_app ? getFirestore(firebase_app) : undefined;
+    if (!db) {
+      throw "Database doesn't exist";
+    }
+
+    const q = query(
+      collection(db, "classrooms"),
+      where("userId", "==", userId)
+    );
+    const classroomsSnap = await getDocs(q);
+    const classrooms = classroomsSnap.docs.map((doc) => ({
+      id: doc.id,
+      name: doc.data().name,
+      courses: doc.data().courses || [],
+      userId: doc.data().userId,
+    }));
+
+    return classrooms;
+  } catch (error) {
+    console.error("Error retrieving classrooms:", error);
+    return [];
+  }
 }

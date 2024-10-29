@@ -24,20 +24,20 @@ export function CourseDetailDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{course.title}</DialogTitle>
+          <DialogTitle>{course.courseTitle}</DialogTitle>
           <DialogDescription className="mt-4">
             <div className="space-y-4">
               <div>
                 <h4 className="font-semibold">Description:</h4>
-                <p>{course.description}</p>
+                <p>{course.courseDescription}</p>
               </div>
               <div>
                 <h4 className="font-semibold">Language:</h4>
                 <p>{course.courseLanguage}</p>
               </div>
               <div>
-                <h4 className="font-semibold">Level:</h4>
-                <p>{course.level}</p>
+                <h4 className="font-semibold">Language:</h4>
+                <p>{course.courseLanguage}</p>
               </div>
             </div>
           </DialogDescription>

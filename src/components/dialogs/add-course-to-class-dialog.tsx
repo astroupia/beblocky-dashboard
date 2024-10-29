@@ -17,12 +17,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Course } from "@/hooks/user-courses";
-import { Classroom } from "@/types";
 import { toast } from "@/components/ui/use-toast";
+import { addCourseToClass } from "@/actions/parents";
 
 interface AddCourseToClassDialogProps {
   course: Course;
-  // Update the type to match what Firestore returns plus the document ID
   classrooms: Array<{
     id: string;
     name: string;
@@ -42,6 +41,7 @@ export function AddCourseToClassDialog({
   const [selectedClass, setSelectedClass] = useState("");
 
   const handleSubmit = async () => {
+    console.log("in handle submit", selectedClass, course._id);
     if (!selectedClass) {
       toast({
         title: "Please select a class",
@@ -51,20 +51,24 @@ export function AddCourseToClassDialog({
     }
 
     try {
-      // Add your logic here to update the classroom with the new course
-      // You'll need to create a new server action for this
-      toast({
-        title: "Course added to class successfully!",
-      });
-      onClose();
+      const result = await addCourseToClass(selectedClass, course._id);
+      if (result.success) {
+        console.log("in handle submit", selectedClass, course._id);
+        toast({
+          title: "Course added to class successfully!",
+        });
+        onClose();
+      } else {
+        throw result.error || "Failed to add course to class";
+      }
     } catch (error) {
       toast({
-        title: "Failed to add course to class",
+        title: error as string,
         variant: "destructive",
       });
     }
   };
-
+  console.log("Dialog rendered");
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
@@ -73,12 +77,16 @@ export function AddCourseToClassDialog({
         </DialogHeader>
         <div className="py-4">
           <Select onValueChange={setSelectedClass} value={selectedClass}>
-            <SelectTrigger>
+            <SelectTrigger className="text-apple">
               <SelectValue placeholder="Select a class" />
             </SelectTrigger>
             <SelectContent>
               {classrooms.map((classroom) => (
-                <SelectItem key={classroom.id} value={classroom.id}>
+                <SelectItem
+                  className="text-apple cursor-pointer"
+                  key={classroom.id}
+                  value={classroom.id}
+                >
                   {classroom.name}
                 </SelectItem>
               ))}

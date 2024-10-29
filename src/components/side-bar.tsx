@@ -33,9 +33,9 @@ export function SideBar({ items }: Props) {
       <Image
         src={Logo}
         alt="Beblocky logo"
-        className=" p-4 px-8"
-        width={180}
-        height={180}
+        className=" p-4 px-8 w-30 h-50"
+        width={250}
+        height={250}
       />
       <SearchBar />
       <nav className="grid items-start gap-2 top-24 sticky">

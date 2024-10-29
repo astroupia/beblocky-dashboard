@@ -67,7 +67,7 @@ export async function getDashboardData() {
   throw "User Doesn't Exist";
 }
 
-export async function addCourseToClass(classroomId: string, courseId: string) {
+export async function addCourseToClass(classroomId: string, courseId: number) {
   try {
     const db = firebase_app ? getFirestore(firebase_app) : undefined;
     if (!db) {
@@ -93,6 +93,32 @@ export async function getClassrooms() {
     }
 
     const classroomsSnap = await getDocs(collection(db, "classrooms"));
+    const classrooms = classroomsSnap.docs.map((doc) => ({
+      id: doc.id,
+      name: doc.data().name,
+      courses: doc.data().courses || [],
+      userId: doc.data().userId,
+    }));
+
+    return classrooms;
+  } catch (error) {
+    console.error("Error retrieving classrooms:", error);
+    return [];
+  }
+}
+
+export async function getClassroomsByUserId(userId: string) {
+  try {
+    const db = firebase_app ? getFirestore(firebase_app) : undefined;
+    if (!db) {
+      throw "Database doesn't exist";
+    }
+
+    const q = query(
+      collection(db, "classrooms"),
+      where("userId", "==", userId)
+    );
+    const classroomsSnap = await getDocs(q);
     const classrooms = classroomsSnap.docs.map((doc) => ({
       id: doc.id,
       name: doc.data().name,

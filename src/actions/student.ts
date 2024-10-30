@@ -12,6 +12,10 @@ import {
   getFirestore,
   setDoc,
   updateDoc,
+  query,
+  collection,
+  getDocs,
+  where,
 } from "firebase/firestore";
 import { addSubscription } from "@/actions/subscription"; // Import the addSubscription function
 
@@ -178,8 +182,53 @@ export const getUser = async (userId: string) => {
   const user = await auth().getUser(userId);
   const ref = doc(db, "students", userId);
   const students = (await getDoc(ref)).data() as Student;
-  const classroom = (
-    await getDoc(doc(db, "classrooms", students.classroom))
-  ).data() as Classroom;
-  return { ...user, ...students, classroom };
+
+  if (!students?.classroom) {
+    return {
+      ...user,
+      ...students,
+      classroom: {
+        ownerName: "Unknown",
+        studentsCount: 0,
+      },
+    };
+  }
+
+  const classroomRef = doc(db, "classrooms", students.classroom);
+  const classroomDoc = await getDoc(classroomRef);
+  const classroom = classroomDoc.data() as Classroom;
+
+  if (!classroom?.uid) {
+    return {
+      ...user,
+      ...students,
+      classroom: {
+        ...classroom,
+        ownerName: "Unknown",
+        studentsCount: 0,
+      },
+    };
+  }
+
+  // Get parent/school name with null check
+  const ownerRef = doc(db, "users", classroom.uid);
+  const ownerDoc = await getDoc(ownerRef);
+  const owner = ownerDoc.data();
+
+  // Get number of students in this class
+  const studentsQuery = query(
+    collection(db, "students"),
+    where("classroom", "==", students.classroom)
+  );
+  const studentsCount = (await getDocs(studentsQuery)).size;
+
+  return {
+    ...user,
+    ...students,
+    classroom: {
+      ...classroom,
+      ownerName: owner?.name,
+      studentsCount,
+    },
+  };
 };

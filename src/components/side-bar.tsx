@@ -30,14 +30,20 @@ export function SideBar({ items }: Props) {
   };
   return (
     <div>
-      <Image
-        src={Logo}
-        alt="Beblocky logo"
-        className=" p-4 px-8"
-        width={180}
-        height={180}
-      />
+      <div className="relative">
+        <Image
+          src={Logo}
+          alt="Beblocky logo"
+          className="p-4 px-8 w-30 h-50"
+          width={250}
+          height={250}
+        />
+      </div>
+
       <SearchBar />
+      <span className="absolute top-4 right-4 bg-gradient-to-r from-apple-500 to-ecstasy text-white text-xs px-2 py-1 rounded-full animate-pulse">
+        BETA
+      </span>
       <nav className="grid items-start gap-2 top-24 sticky">
         {items.map((item) => {
           const Icon = Icons[item.icon];

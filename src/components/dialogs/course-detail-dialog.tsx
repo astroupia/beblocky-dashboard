@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import {
   Dialog,
   DialogContent,
@@ -15,34 +16,30 @@ interface CourseDetailDialogProps {
   onClose: () => void;
 }
 
-export function CourseDetailDialog({
-  course,
-  isOpen,
-  onClose,
-}: CourseDetailDialogProps) {
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{course.courseTitle}</DialogTitle>
-          <DialogDescription className="mt-4">
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-semibold">Description:</h4>
-                <p>{course.courseDescription}</p>
-              </div>
-              <div>
-                <h4 className="font-semibold">Language:</h4>
-                <p>{course.courseLanguage}</p>
-              </div>
-              <div>
-                <h4 className="font-semibold">Language:</h4>
-                <p>{course.courseLanguage}</p>
-              </div>
-            </div>
-          </DialogDescription>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
-  );
-}
+export const CourseDetailDialog = dynamic(
+  () =>
+    Promise.resolve(({ course, isOpen, onClose }: CourseDetailDialogProps) => {
+      return (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>{course.courseTitle}</DialogTitle>
+              <DialogDescription className="mt-4">
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold">Description:</h4>
+                    <p>{course.courseDescription}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">Language:</h4>
+                    <p>{course.courseLanguage}</p>
+                  </div>
+                </div>
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+      );
+    }),
+  { ssr: false }
+);

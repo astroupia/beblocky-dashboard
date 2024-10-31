@@ -38,6 +38,22 @@ export interface School {
   uid: string;
 }
 
-export interface StudentCourse { }
+export interface StudentCourse {}
 
 export type Role = "parent" | "school" | "student";
+
+export interface Progress {
+  userId: string;
+  hoursSpent: number;
+  coinsEarned: number;
+  achievements: Achievement[];
+  lastUpdated: Date;
+}
+
+export interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  dateEarned: Date;
+  type: "CODING_STREAK" | "MASTERY_LEVEL" | "CHALLENGE_COMPLETE";
+}

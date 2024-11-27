@@ -1,18 +1,41 @@
-import { Suspense } from "react";
-import { PageHeader } from "@/components/page-header";
-import { COURSE_URL } from "@/lib/constant";
-import { Course } from "@/hooks/user-courses";
-import { CoursesClient } from "./courses-client";
+import { useEffect, useState } from "react";
 
-// This will be the server component
-export default async function CoursesRoute() {
-  const courses = await fetch(COURSE_URL).then(
-    async (res) => (await res.json()) as { courses: Course[] }
-  );
+const CoursesPage = () => {
+  const [courses, setCourses] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await fetch("/api/courses"); // Adjust the API endpoint as needed
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        setCourses(data);
+      } catch (err: any) {
+        setError(err.message);
+        console.error("Error fetching courses:", err);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <CoursesClient courses={courses.courses} />
-    </Suspense>
+    <div>
+      <h1>Courses</h1>
+      <ul>
+        {courses.map((course: { id: string; name: string }) => (
+          <li key={course.id}>{course.name}</li>
+        ))}
+      </ul>
+    </div>
   );
-}
+};
+
+export default CoursesPage;

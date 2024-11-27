@@ -8,12 +8,7 @@ import { errorToast } from "@/lib/error-toast";
 import { auth } from "@/lib/firebase/firebase-auth";
 import { SignInSchema, signInSchema } from "@/lib/schema/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  getRedirectResult,
-  signInWithEmailAndPassword,
-  sendEmailVerification,
-  sendPasswordResetEmail,
-} from "firebase/auth";
+import { getRedirectResult, signInWithEmailAndPassword } from "firebase/auth";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -70,16 +65,25 @@ export default function page() {
         return;
       }
 
-      await fetch("/api/sign-in", {
+      const response = await fetch("/api/sign-in", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${await userCred.user.getIdToken()}`,
         },
-      }).then((response) => {
-        if (response.status === 200) {
-          router.push("/dashboard");
-        }
       });
+
+      if (response.status === 200) {
+        router.push("/dashboard");
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Session expired",
+          description: errorData.error || "Please log in again.",
+          variant: "destructive",
+        });
+        // Optionally redirect to sign-in page
+        router.push("/sign-in");
+      }
     } catch (e: any) {
       toast({
         title:

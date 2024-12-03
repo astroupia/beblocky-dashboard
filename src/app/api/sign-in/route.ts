@@ -18,7 +18,7 @@ export async function POST(request: NextRequest, response: NextResponse) {
       const decodedToken = await auth().verifyIdToken(idToken);
       console.log(idToken, "Id token", "decoded", decodedToken);
       if (decodedToken) {
-        //Generate session cookie
+        // Generate session cookie
         const expiresIn = 60 * 60 * 24 * 5 * 1000;
         const sessionCookie = await auth().createSessionCookie(idToken, {
           expiresIn,
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest, response: NextResponse) {
           httpOnly: true,
           secure: true,
         };
-        //Add the cookie to the browser
+        // Add the cookie to the browser
         cookies().set(options);
         return NextResponse.json({}, { status: 200 });
       }
@@ -44,12 +44,12 @@ export async function POST(request: NextRequest, response: NextResponse) {
 export async function GET(request: NextRequest) {
   const session = cookies().get("session")?.value || "";
 
-  //Validate if the cookie exist in the request
+  // Validate if the cookie exists in the request
   if (!session) {
     return NextResponse.json({ isLogged: false }, { status: 401 });
   }
 
-  //Use Firebase Admin to validate the session cookie
+  // Use Firebase Admin to validate the session cookie
   const decodedClaims = await auth().verifySessionCookie(session, true);
 
   if (!decodedClaims) {
@@ -57,16 +57,4 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.json({ isLogged: true }, { status: 200 });
-}
-
-export async function POSTSignIn(request: NextRequest) {
-  const body = await request.json();
-  const parsedData = signInSchema.safeParse(body);
-
-  if (!parsedData.success) {
-    return NextResponse.json(
-      { error: parsedData.error.errors },
-      { status: 400 }
-    );
-  }
 }

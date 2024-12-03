@@ -10,51 +10,55 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
 export default async function Page() {
-  // Check for cookies to determine if the user is authenticated
   const cookieStore = cookies();
   const sessionCookie = cookieStore.get("session")?.value;
 
   if (!sessionCookie) {
-    // If no session cookie, redirect to sign-in
     redirect("/sign-in");
   }
 
   try {
-    const data = await getDashboardData();
-    const school = await getSchools();
+    // Fetch all data concurrently
+    const [dashboardData, schoolData, coursesResponse] = await Promise.all([
+      getDashboardData(),
+      getSchools(),
+      fetch(COURSE_URL),
+    ]);
 
-    // Fetch courses separately
-    const coursesResponse = await fetch(COURSE_URL);
-    const coursesJson = coursesResponse.ok
-      ? await coursesResponse.json()
-      : { courses: [] };
-
-    const courses: Course[] = coursesJson.courses || [];
-
-    if (!data) {
+    if (!dashboardData) {
       redirect("/sign-in");
     }
+
+    // Check if the courses response is ok and parse JSON
+    const coursesJson = coursesResponse.ok
+      ? await coursesResponse.json().catch(() => ({ courses: [] }))
+      : { courses: [] };
+    const courses: Course[] = coursesJson.courses || [];
 
     return (
       <div>
         <SubscriptionModal />
-        {data.role === "parent" ? (
+        {dashboardData.role === "parent" ? (
           <ParentDashboard
-            students={Array.isArray(data.student) ? data.student : []}
+            students={
+              Array.isArray(dashboardData.student) ? dashboardData.student : []
+            }
             courses={courses}
           />
-        ) : data.role === "school" ? (
+        ) : dashboardData.role === "school" ? (
           <SchoolDashboard
-            data={Array.isArray(school) ? school : []}
+            data={Array.isArray(schoolData) ? schoolData : []}
             courses={courses}
           />
         ) : (
           <StudentDashboard
             courses={courses.filter(
               (course) =>
-                data.classroom?.courses.includes(course._id.toString()) ||
-                (Array.isArray(data.student) &&
-                  data.student.some(
+                dashboardData.classroom?.courses.includes(
+                  course._id.toString()
+                ) ||
+                (Array.isArray(dashboardData.student) &&
+                  dashboardData.student.some(
                     (student) =>
                       Array.isArray(student.courses) &&
                       student.courses.includes(course._id.toString())
@@ -66,6 +70,6 @@ export default async function Page() {
     );
   } catch (error) {
     console.error("Error fetching data:", error);
-    redirect("/sign-in"); // Redirect on error
+    redirect("/sign-in");
   }
 }

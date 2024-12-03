@@ -3,6 +3,7 @@ import { auth } from "firebase-admin";
 
 import { cookies, headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { signInSchema } from "@/lib/schema/auth";
 
 // Init the Firebase SDK every time the server is called
 customInitApp();
@@ -56,4 +57,16 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.json({ isLogged: true }, { status: 200 });
+}
+
+export async function POSTSignIn(request: NextRequest) {
+  const body = await request.json();
+  const parsedData = signInSchema.safeParse(body);
+
+  if (!parsedData.success) {
+    return NextResponse.json(
+      { error: parsedData.error.errors },
+      { status: 400 }
+    );
+  }
 }

@@ -1,18 +1,28 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAuth, signOut } from "firebase/auth";
-import app from "@/lib/firebase/firebase-client";
-
-const auth = getAuth(app);
+import { cookies } from "next/headers";
 
 const Page = () => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    router.push("/sign-in");
+    const session = cookies().get("session")?.value;
+
+    if (!session) {
+      router.push("/sign-in");
+    } else {
+      console.log("User is authenticated");
+    }
+
+    setIsLoading(false);
   }, [router]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return null;
 };

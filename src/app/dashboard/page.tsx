@@ -10,6 +10,15 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
 export default async function Page() {
+  // Check for cookies to determine if the user is authenticated
+  const cookieStore = cookies();
+  const sessionCookie = cookieStore.get("session")?.value;
+
+  if (!sessionCookie) {
+    // If no session cookie, redirect to sign-in
+    redirect("/sign-in");
+  }
+
   try {
     const [data, school, coursesResponse] = await Promise.all([
       getDashboardData(),
@@ -18,7 +27,8 @@ export default async function Page() {
     ]);
 
     if (!data) {
-      return redirect("/sign-in");
+      // If no dashboard data, redirect to sign-in
+      redirect("/sign-in");
     }
 
     let courses: Course[] = [];
@@ -51,6 +61,7 @@ export default async function Page() {
       </div>
     );
   } catch (error) {
-    redirect("/sign-in");
+    console.error("Error fetching data:", error);
+    redirect("/sign-in"); // Redirect on error
   }
 }

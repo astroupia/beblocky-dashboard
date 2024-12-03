@@ -12,13 +12,15 @@ import SearchBar from "./search-bar";
 import { StudentCard } from "./student-card";
 import { Course } from "@/hooks/user-courses";
 
-export function SchoolDashboard({
-  data,
-  courses
-}: {
-  data: { classRoom: Classroom; students: Student[] }[];
-  courses: Course[]
-}) {
+interface SchoolDashboardProps {
+  data: {
+    classRoom: Classroom;
+    students: Student[];
+  }[];
+  courses: Course[];
+}
+
+export function SchoolDashboard({ data, courses }: SchoolDashboardProps) {
   const pathname = usePathname();
   const array: Student[] = [];
   const students = array.concat(...data.map((d) => d.students));
@@ -80,11 +82,8 @@ export function SchoolDashboard({
               <AddClassModal />
             </div>
             <div className="flex flex-col md:flex-row md:items-center gap-2 py-4">
-              {data.map((classRoom) => (
-                <ClassroomCard
-                  key={classRoom.classRoom.name}
-                  classroom={classRoom.classRoom}
-                />
+              {data.map(({ classRoom, students }) => (
+                <ClassroomCard classroom={classRoom} />
               ))}
             </div>
           </Tab>

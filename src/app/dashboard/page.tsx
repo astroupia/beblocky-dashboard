@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { getDashboardData } from "@/actions/parents";
 import { getSchools } from "@/actions/schools";
 import { SubscriptionModal } from "@/components/dialogs/subscribtion-modal";
@@ -8,91 +7,61 @@ import { StudentDashboard } from "@/components/student-dashboard";
 import { Course } from "@/hooks/user-courses";
 import { COURSE_URL } from "@/lib/constant";
 import { redirect } from "next/navigation";
-import { Student, Classroom } from "@/types";
+import { cookies } from "next/headers";
 
-// Define types for your data
-type DashboardData =
-  | { role: "parent"; student: Student[]; classroom?: undefined }
-  | { role: "school"; student?: undefined; classroom?: undefined }
-  | { role: "student"; student: Student; classroom: Classroom };
+export default async function Page() {
+  // Check for cookies to determine if the user is authenticated
+  const cookieStore = cookies();
+  const sessionCookie = cookieStore.get("session")?.value;
 
-type SchoolData = {
-  classRoom: Classroom;
-  students: Student[];
-}[];
-
-export default function DashboardPage() {
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [school, setSchool] = useState<SchoolData | null>(null);
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [dashboardData, schoolData, coursesResponse] = await Promise.all([
-          getDashboardData(),
-          getSchools(),
-          fetch(COURSE_URL),
-        ]);
-
-        if (!dashboardData) {
-          redirect("/sign-in");
-          return;
-        }
-        setData(dashboardData);
-        setSchool(schoolData as SchoolData);
-
-        if (coursesResponse.ok) {
-          const json = await coursesResponse.json();
-          setCourses(json.courses);
-        }
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        setError(err instanceof Error ? err.message : String(err));
-        redirect("/sign-in");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return <div>Loading...</div>; // Show a loading state
+  if (!sessionCookie) {
+    // If no session cookie, redirect to sign-in
+    redirect("/sign-in");
   }
 
-  if (error) {
-    return <div>Error loading dashboard. Please try again later.</div>; // Handle errors
-  }
+  try {
+    const [data, school, coursesResponse] = await Promise.all([
+      getDashboardData(),
+      getSchools(),
+      fetch(COURSE_URL),
+    ]);
 
-  if (!data) {
-    return <div>No data available.</div>; // Handle case where data is null
-  }
+    if (!data) {
+      // If no dashboard data, redirect to sign-in
+      redirect("/sign-in");
+    }
 
-  return (
-    <div>
-      <SubscriptionModal />
-      {data.role === "parent" ? (
-        <ParentDashboard students={data.student ?? []} courses={courses} />
-      ) : data.role === "school" ? (
-        <SchoolDashboard data={school ?? []} courses={courses} />
-      ) : (
-        <StudentDashboard
-          courses={courses.filter(
-            (course) =>
-              data.classroom?.courses.includes(course._id.toString()) ||
-              (Array.isArray(data.student) &&
-                data.student.some(
-                  (student) =>
-                    Array.isArray(student.courses) &&
-                    student.courses.includes(course._id.toString())
-                ))
-          )}
-        />
-      )}
-    </div>
-  );
+    let courses: Course[] = [];
+    if (coursesResponse.ok) {
+      const json = await coursesResponse.json();
+      courses = json.courses;
+    }
+
+    return (
+      <div>
+        <SubscriptionModal />
+        {data.role === "parent" ? (
+          <ParentDashboard students={data.student ?? []} courses={courses} />
+        ) : data.role === "school" ? (
+          <SchoolDashboard data={school ?? []} courses={courses} />
+        ) : (
+          <StudentDashboard
+            courses={courses.filter(
+              (course) =>
+                data.classroom?.courses.includes(course._id.toString()) ||
+                (Array.isArray(data.student) &&
+                  data.student.some(
+                    (student) =>
+                      Array.isArray(student.courses) &&
+                      student.courses.includes(course._id.toString())
+                  ))
+            )}
+          />
+        )}
+      </div>
+    );
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    redirect("/sign-in"); // Redirect on error
+  }
 }

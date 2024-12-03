@@ -32,7 +32,9 @@ export default async function Page() {
       <div>
         <PageHeader />
         <div className="my-4">
-          <ProgressTabs data={students} />
+          <ProgressTabs
+            data={Array.isArray(students) ? students : [students]}
+          />
         </div>
       </div>
     );

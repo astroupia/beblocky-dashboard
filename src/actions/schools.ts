@@ -21,50 +21,54 @@ customInitApp();
 const db = firebase_app ? getFirestore(firebase_app) : undefined;
 
 export async function getSchools() {
-  const session = cookies().get("session")?.value || "";
+  const session = cookies().get("session")?.value;
   if (!session) {
-    throw "Session not found";
+    throw new Error("Session not found");
   }
+
   const decodedClaims = await auth().verifySessionCookie(session, true);
   const { uid } = decodedClaims;
+
   if (!db) {
-    throw "Database doesn't exist";
+    throw new Error("Database doesn't exist");
   }
-  const userRef = doc(db, "users", uid);
-  const userSnap = await getDoc(userRef);
-  if (userSnap.exists()) {
-    const user = userSnap.data() as User;
-    if (user.role === "school") {
-      const q = query(collection(db, "classrooms"), where("userId", "==", uid));
-      const querySnapshot = await getDocs(q);
-      const data = await Promise.all(
-        querySnapshot.docs.map(async (doc) => {
-          const studentsQuery = query(
-            collection(db, "students"),
-            where("classroom", "==", doc.id)
-          );
-          const studentsSnap = await getDocs(studentsQuery);
-          const students = studentsSnap.docs.map(
-            (doc) => ({ ...doc.data() } as Student)
-          );
-          const classrooms = { ...(doc.data() as Classroom), uid: doc.id };
-          // console.log({
-          //   students,
-          // });
-          return {
-            classRoom: classrooms,
-            students: students.map((s) => ({
-              ...s,
-              courses: [...s.courses!, ...classrooms.courses],
-            })),
-          };
-        })
-      );
-      return data;
-    }
+
+  // Get user data and classrooms in parallel
+  const [userSnap, classroomsSnap] = await Promise.all([
+    getDoc(doc(db, "users", uid)),
+    getDocs(query(collection(db, "classrooms"), where("userId", "==", uid))),
+  ]);
+
+  if (!userSnap.exists()) {
+    throw new Error("User Doesn't Exist");
+  }
+
+  const user = userSnap.data() as User;
+  if (user.role !== "school") {
     return null;
   }
-  throw "User Doesn't Exist";
+
+  // Process all classrooms in parallel
+  const data = await Promise.all(
+    classroomsSnap.docs.map(async (doc) => {
+      const studentsSnap = await getDocs(
+        query(collection(db, "students"), where("classroom", "==", doc.id))
+      );
+
+      const classrooms = { ...(doc.data() as Classroom), uid: doc.id };
+      const students = studentsSnap.docs.map((doc) => ({
+        ...(doc.data() as Student),
+        courses: [...(doc.data().courses || []), ...classrooms.courses],
+      }));
+
+      return {
+        classRoom: classrooms,
+        students,
+      };
+    })
+  );
+
+  return data;
 }
 
 export const addClass = async (

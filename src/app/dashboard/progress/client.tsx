@@ -9,13 +9,18 @@ interface props {
   data: Student[];
 }
 export const ProgressTabs = ({ data }: props) => {
-  const courses = useCourses()
+  const courses = useCourses();
   return (
     <>
       {data?.length ? (
         <div className=" py-4 flex md:flex-row flex-col items-start gap-4">
           {data.map((student) => (
-            <StudentCard classrooms={[]} student={student} key={student.name} courses={courses.courses ?? []} />
+            <StudentCard
+              key={student.userId}
+              classrooms={[]}
+              student={student}
+              courses={courses.courses ?? []}
+            />
           ))}
         </div>
       ) : (

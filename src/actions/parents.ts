@@ -20,9 +20,7 @@ import { cookies } from "next/headers";
 
 export async function getDashboardData() {
   const session = cookies().get("session")?.value;
-
   if (!session) {
-    console.error("Session not found");
     throw new Error("Session not found");
   }
 
@@ -31,52 +29,48 @@ export async function getDashboardData() {
   const db = firebase_app ? getFirestore(firebase_app) : undefined;
 
   if (!db) {
-    console.error("Database doesn't exist");
     throw new Error("Database doesn't exist");
   }
 
-  const userRef = doc(db, "users", uid);
-  const userSnap = await getDoc(userRef);
-
+  const userSnap = await getDoc(doc(db, "users", uid));
   if (!userSnap.exists()) {
-    console.error("User doesn't exist");
     throw new Error("User doesn't exist");
   }
 
   const user = userSnap.data() as User;
-  console.log("User found:", user);
 
-  if (user.role === "parent") {
-    const studentsSnap = await getDocs(
-      query(collection(db, "students"), where("parentId", "==", uid))
-    );
-    const students = studentsSnap.docs.map(
-      (doc) => ({ ...doc.data() } as Student)
-    );
-    console.log("Students found:", students);
-    return { student: students, role: user.role };
+  switch (user.role) {
+    case "parent":
+      const studentsSnap = await getDocs(
+        query(collection(db, "students"), where("parentId", "==", uid))
+      );
+      return {
+        student: studentsSnap.docs.map((doc) => ({ ...doc.data() } as Student)),
+        role: user.role,
+      };
+
+    case "school":
+      return { role: user.role };
+
+    default: // student
+      const studentSnap = await getDocs(
+        query(collection(db, "students"), where("userId", "==", user.uid))
+      );
+
+      if (!studentSnap.docs[0]) {
+        return null;
+      }
+
+      const classroomSnap = await getDoc(
+        doc(db, "classrooms", studentSnap.docs[0].data().classroom)
+      );
+
+      return {
+        role: "student",
+        student: studentSnap.docs[0].data() as Student,
+        classroom: classroomSnap?.data() as Classroom,
+      };
   }
-
-  if (user.role === "school") {
-    console.log("User role is school");
-    return { role: user.role };
-  }
-
-  const studentSnap = await getDocs(
-    query(collection(db, "students"), where("userId", "==", user.uid))
-  );
-  const student = studentSnap.docs[0]?.data() as Student;
-
-  if (!student) {
-    console.error("No student found for user");
-    return null;
-  }
-
-  const classroomSnap = await getDoc(doc(db, "classrooms", student.classroom));
-  const classroom = classroomSnap.data() as Classroom;
-
-  console.log("Classroom found:", classroom);
-  return { role: "student", student, classroom };
 }
 
 export async function addCourseToClass(classroomId: string, courseId: number) {

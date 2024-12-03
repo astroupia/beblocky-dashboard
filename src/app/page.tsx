@@ -2,29 +2,23 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { cookies } from "next/headers";
 
 const Page = () => {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+  const [cookieData, setCookieData] = useState<string | null>(null);
 
   useEffect(() => {
-    const session = cookies().get("session")?.value;
+    // Handle cookies using client-side logic, e.g., using document.cookie
+    const cookies = document.cookie;
+    setCookieData(cookies);
+  }, []);
 
-    if (!session) {
-      router.push("/sign-in");
-    } else {
-      console.log("User is authenticated");
-    }
-
-    setIsLoading(false);
-  }, [router]);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  return null;
+  return (
+    <div>
+      {/* Your component JSX here */}
+      <p>Cookie Data: {cookieData}</p>
+    </div>
+  );
 };
 
 export default Page;

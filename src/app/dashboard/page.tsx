@@ -41,9 +41,15 @@ export default async function Page() {
       <div>
         <SubscriptionModal />
         {data.role === "parent" ? (
-          <ParentDashboard students={data.student ?? []} courses={courses} />
+          <ParentDashboard
+            students={Array.isArray(data.student) ? data.student : []}
+            courses={courses}
+          />
         ) : data.role === "school" ? (
-          <SchoolDashboard data={school ?? []} courses={courses} />
+          <SchoolDashboard
+            data={Array.isArray(school) ? school : []}
+            courses={courses}
+          />
         ) : (
           <StudentDashboard
             courses={courses.filter(

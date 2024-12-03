@@ -20,22 +20,19 @@ export default async function Page() {
   }
 
   try {
-    const [data, school, coursesResponse] = await Promise.all([
+    const [data, school, coursesJson] = await Promise.all([
       getDashboardData(),
       getSchools(),
-      fetch(COURSE_URL),
+      fetch(COURSE_URL)
+        .then((res) => (res.ok ? res.json() : { courses: [] }))
+        .catch(() => ({ courses: [] })),
     ]);
 
     if (!data) {
-      // If no dashboard data, redirect to sign-in
       redirect("/sign-in");
     }
 
-    let courses: Course[] = [];
-    if (coursesResponse.ok) {
-      const json = await coursesResponse.json();
-      courses = json.courses;
-    }
+    const courses: Course[] = coursesJson.courses || [];
 
     return (
       <div>

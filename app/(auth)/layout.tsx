@@ -1,9 +1,19 @@
-const layout = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div className="flex-center min-h-screen w-full bg-primary-50 bg-dotted-pattern bg-cover bg-fixed bg-center">
-      {children}
-    </div>
-  );
-};
+import { ClerkProvider } from "@clerk/nextjs";
+import BrandDesign from "../../components/layout/BrandDesign";
 
-export default layout;
+export default function layout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <ClerkProvider>
+        <body>
+          <div className="flex min-h-screen">
+            <div className="flex-none p-4">
+              <BrandDesign />
+            </div>
+            <div className="flex-grow">{children}</div>
+          </div>
+        </body>
+      </ClerkProvider>
+    </html>
+  );
+}

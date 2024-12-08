@@ -1,35 +1,30 @@
 "use client";
 
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { signOut } from "next-auth/react";
-import { Bell } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
-interface HeaderProps {
-  userName: string;
-}
-
-export function Header({ userName }: HeaderProps) {
+export default function Header() {
   return (
-    <div className="flex justify-between items-center mb-8">
-      <div>
-        <h1 className="text-4xl font-bold text-primary">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back, {userName}</p>
+    <header className="bg-white dark:bg-gray-800 shadow">
+      <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          Admin Dashboard
+        </h1>
+        <div className="flex items-center space-x-4">
+          <form className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400" />
+            <Input
+              className="pl-8 bg-gray-100 dark:bg-gray-700 dark:text-white"
+              placeholder="Search..."
+            />
+          </form>
+          <Avatar>
+            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+            <AvatarFallback>AD</AvatarFallback>
+          </Avatar>
+        </div>
       </div>
-      <div className="flex items-center gap-4">
-        <button className="p-2 rounded-md hover:bg-accent relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute -top-1 -right-1 bg-secondary text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-            3
-          </span>
-        </button>
-        <ThemeToggle />
-        <button
-          onClick={() => signOut()}
-          className="bg-secondary hover:bg-secondary/90 text-white font-bold py-2 px-4 rounded"
-        >
-          Sign Out
-        </button>
-      </div>
-    </div>
+    </header>
   );
 }

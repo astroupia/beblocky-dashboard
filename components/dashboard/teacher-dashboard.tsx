@@ -1,8 +1,8 @@
 "use client";
 
-import Sidebar from "@/components/dashboard/Sidebar";
+import Sidebar from "@/components/dashboard/sidebar";
 import Header from "@/components/dashboard/header";
-import Metrics from "@/components/dashboard/Metrics";
+import Metrics from "@/components/dashboard/metrics";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -61,7 +61,15 @@ export default function TeacherDashboard() {
       <div className="flex-1 overflow-y-auto">
         <Header />
         <main className="p-4 sm:p-6 lg:p-8">
-          <Metrics metrics={metrics} />
+          <Metrics
+            metrics={{
+              ...metrics,
+              totalRevenue: 0,
+              totalStudents: 0,
+              totalTeachers: 0,
+              totalSchools: 0,
+            }}
+          />
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <Card className="bg-white dark:bg-gray-800">

@@ -1,8 +1,7 @@
 "use client";
 
-import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/header";
-import Metrics from "@/components/dashboard/Metrics";
+import Sidebar from "@/components/dashboard/sidebar";
 import { useState, useEffect } from "react";
 import {
   Card,

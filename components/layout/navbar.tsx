@@ -39,6 +39,9 @@ export function Navbar() {
               Pricing
             </Link>
             <SignedIn>
+              <Link href="/dashboard">
+                <h1 className="text-l text-indigo-700">Dashboard</h1>
+              </Link>
               <UserButton />
             </SignedIn>
             <SignedOut>

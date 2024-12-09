@@ -1,4 +1,4 @@
-import { ClerkProvider } from "@clerk/nextjs";
+import { ClerkProvider, SignedOut, SignedIn } from "@clerk/nextjs";
 import "./globals.css";
 import { Metadata } from "next";
 

@@ -31,7 +31,7 @@ export async function updateUser(clerkId: string, user: UpdateUserParams) {
 export async function getUserRole(userId: string): Promise<string> {
   await connectToDatabase();
   const user = await User.findOne({ clerkId: userId });
-  return user?.role || "customer";
+  return user?.role || "teacher";
 }
 
 // Deletes a user from the database

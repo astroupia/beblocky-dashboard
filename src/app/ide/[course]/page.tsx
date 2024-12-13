@@ -16,21 +16,36 @@ export default async function page({ params }: { params: { course: string } }) {
     userId = decodedClaims.uid;
   }
 
-  const courses = await fetch(COURSE_URL)
-    .then(async (res) => await res.json())
-    .then((res) => res.courses as Course[]);
-  const course = courses?.find((c) => c._id.toString() === params.course);
-  const slides: Slide[] = course?.slides ?? [];
-  course?.lessons.map((d) => slides.push(...d.slides));
+  try {
+    const response = await fetch(COURSE_URL);
 
-  if (!slides.length) {
-    return null;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const coursesJson = await response.json();
+    const courses: Course[] = coursesJson.courses || [];
+
+    console.log(courses);
+
+    const course = courses.find((c) => c._id.toString() === params.course);
+    const slides: Slide[] = course?.slides ?? [];
+    course?.lessons.map((d) => slides.push(...d.slides));
+
+    if (!slides.length) {
+      return null;
+    }
+
+    console.log(slides);
+
+    return (
+      <>
+        {userId && <TimeTracker userId={userId} />}
+        <IdePage slides={slides} courseId={course?._id ?? 0} />
+      </>
+    );
+  } catch (error) {
+    console.error("Error fetching courses:", error);
+    return <div>Error loading courses. Please try again later.</div>;
   }
-
-  return (
-    <>
-      {userId && <TimeTracker userId={userId} />}
-      <IdePage slides={slides} courseId={course?._id ?? 0} />
-    </>
-  );
 }

@@ -45,34 +45,44 @@ export default function TeacherDashboard() {
   };
 
   const studentData = [
-    { id: 1, name: "Alice Johnson", email: "alice@example.com", progress: 85 },
-    { id: 2, name: "Bob Smith", email: "bob@example.com", progress: 90 },
+    {
+      id: 1,
+      name: "Nahom Teguade",
+      email: "nahomteguade@gmail.com",
+      progress: 85,
+    },
+    { id: 2, name: "Natan", email: "natan@beblocky.com", progress: 90 },
     {
       id: 3,
-      name: "Charlie Brown",
-      email: "charlie@example.com",
+      name: "Nahom Astra",
+      email: "nahomastra@gmail.com",
       progress: 70,
     },
   ];
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-[#892FFF] to-[#FF932C] dark:from-gray-900 dark:to-gray-800">
-      <Sidebar theme={theme} toggleTheme={toggleTheme} />
-      <div className="flex-1 overflow-y-auto">
-        <Header />
+    <div className="min-h-screen p-8 flex h-screen bg-white dark:bg-gray-900">
+      {/* <Sidebar theme={theme} toggleTheme={toggleTheme} /> */}
+      <div className="container mx-auto flex-1 overflow-y-auto">
+        <Header
+          page={"teacher"}
+          header={"Teacher Dashboard"}
+          theme={theme}
+          toggleTheme={toggleTheme}
+        />
         <main className="p-4 sm:p-6 lg:p-8">
           <Metrics
             metrics={{
               ...metrics,
-              totalRevenue: 0,
-              totalStudents: 0,
-              totalTeachers: 0,
-              totalSchools: 0,
+              totalRevenue: 15000,
+              totalStudents: 32,
+              totalTeachers: 13,
+              totalSchools: 10,
             }}
           />
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <Card className="bg-white dark:bg-gray-800">
+            {/* <Card className="p-6">
               <CardHeader>
                 <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Assigned Students
@@ -83,8 +93,8 @@ export default function TeacherDashboard() {
                   {metrics.assignedStudents}
                 </div>
               </CardContent>
-            </Card>
-            <Card className="bg-white dark:bg-gray-800">
+            </Card> */}
+            {/* <Card className="p-6">
               <CardHeader>
                 <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Active Courses
@@ -96,7 +106,7 @@ export default function TeacherDashboard() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-white dark:bg-gray-800">
+            <Card className="p-6">
               <CardHeader>
                 <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Upcoming Assignments
@@ -108,7 +118,7 @@ export default function TeacherDashboard() {
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-white dark:bg-gray-800">
+            <Card className="p-6">
               <CardHeader>
                 <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Average Progress
@@ -119,7 +129,7 @@ export default function TeacherDashboard() {
                   {metrics.averageProgress}%
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
 
           <div className="mt-6">

@@ -9,30 +9,51 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { EditCourseDialog } from "./dialogs/edit-course-dialog";
+import { DeleteConfirmationDialog } from "./dialogs/delete-confirmation-dialog";
 
-const courses = [
+interface Course {
+  id: number;
+  courseId: number;
+  courseTitle: string;
+  courseDescription: string;
+  courseLanguage: string;
+  subType: "Free" | "Premium" | "Standard" | "Gold";
+  students: number;
+  progress: number;
+  status: string;
+}
+
+const courses: Course[] = [
   {
     id: 1,
-    title: "HTML Course 1 (Creating a Profile Website)",
-    description: "Learn the basics of HTML, CSS, and JavaScript",
+    courseId: 101,
+    courseTitle: "Introduction to Web Development",
+    courseDescription: "Learn the basics of HTML, CSS, and JavaScript",
+    courseLanguage: "English",
+    subType: "Free",
     students: 234,
     progress: 78,
     status: "Active",
   },
   {
     id: 2,
-    title: "More on Basic HTML",
-    description:
-      "Welcome to the HTML & CSS Basics course for beginners! In this course, you will learn the foundational concepts of HTML and CSS, which are essential for creating web pages. By the end of this course, you will be able to build a simple webpage from scratch. Let's get started on your journey to becoming a web developer",
+    courseId: 102,
+    courseTitle: "Advanced React Patterns",
+    courseDescription: "Master advanced React concepts and patterns",
+    courseLanguage: "English",
+    subType: "Premium",
     students: 156,
     progress: 92,
     status: "Active",
   },
   {
     id: 3,
-    title: "Kid's Car Adventure with HTML",
-    description:
-      "Welcome to the Kids' Car Adventure with HTML! In this exciting course, young learners will discover the world of cars while learning the basics of HTML. Get ready for a fun-filled coding journey with colorful slides, interactive examples, and car-themed activities!",
+    courseId: 103,
+    courseTitle: "Node.js Backend Development",
+    courseDescription: "Build scalable backend applications with Node.js",
+    courseLanguage: "English",
+    subType: "Standard",
     students: 189,
     progress: 45,
     status: "Draft",
@@ -41,12 +62,26 @@ const courses = [
 
 export function CourseGrid() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
 
   const filteredCourses = courses.filter(
     (course) =>
-      course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.description.toLowerCase().includes(searchTerm.toLowerCase())
+      course.courseTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course.courseDescription.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleEdit = (course: Course) => {
+    setEditingCourse(course);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDelete = (course: Course) => {
+    setCourseToDelete(course);
+    setIsDeleteDialogOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -66,42 +101,65 @@ export function CourseGrid() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCourses.map((course) => (
-          <CourseCard key={course.id} course={course} />
+          <CourseCard
+            key={course.id}
+            course={course}
+            onEdit={() => handleEdit(course)}
+            onDelete={() => handleDelete(course)}
+          />
         ))}
       </div>
+
+      <EditCourseDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        course={editingCourse || undefined}
+        mode={editingCourse ? "edit" : "create"}
+      />
+
+      <DeleteConfirmationDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Delete Course"
+        itemToDelete={courseToDelete}
+        itemType="course"
+        onConfirm={() => {
+          // Handle course deletion logic here
+          console.log("Deleting course:", courseToDelete);
+          setIsDeleteDialogOpen(false);
+        }}
+      />
     </div>
   );
 }
 
 interface CourseCardProps {
-  course: {
-    id: number;
-    title: string;
-    description: string;
-    students: number;
-    progress: number;
-    status: string;
-  };
+  course: Course;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
-function CourseCard({ course }: CourseCardProps) {
+function CourseCard({ course, onEdit, onDelete }: CourseCardProps) {
   return (
     <Card className="p-6">
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
-          <p className="text-muted-foreground">{course.description}</p>
+          <h3 className="text-xl font-semibold mb-2">{course.courseTitle}</h3>
+          <p className="text-muted-foreground">{course.courseDescription}</p>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger className="p-2 hover:bg-muted rounded-full">
             <MoreVertical className="h-4 w-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem className="flex items-center">
+            <DropdownMenuItem onClick={onEdit} className="flex items-center">
               <Edit2 className="h-4 w-4 mr-2" />
               Edit Course
             </DropdownMenuItem>
-            <DropdownMenuItem className="flex items-center text-destructive">
+            <DropdownMenuItem
+              onClick={onDelete}
+              className="flex items-center text-destructive"
+            >
               <Trash2 className="h-4 w-4 mr-2" />
               Delete Course
             </DropdownMenuItem>
@@ -127,15 +185,30 @@ function CourseCard({ course }: CourseCardProps) {
           <span className="text-sm text-muted-foreground">
             {course.students} students
           </span>
-          <span
-            className={`px-2 py-1 rounded-full text-sm ${
-              course.status === "Active"
-                ? "bg-green-100 text-green-800"
-                : "bg-yellow-100 text-yellow-800"
-            }`}
-          >
-            {course.status}
-          </span>
+          <div className="flex gap-2">
+            <span
+              className={`px-2 py-1 rounded-full text-xs ${
+                course.status === "Active"
+                  ? "bg-green-100 text-green-800"
+                  : "bg-yellow-100 text-yellow-800"
+              }`}
+            >
+              {course.status}
+            </span>
+            <span
+              className={`px-2 py-1 rounded-full text-xs ${
+                course.subType === "Premium"
+                  ? "bg-purple-100 text-purple-800"
+                  : course.subType === "Standard"
+                  ? "bg-blue-100 text-blue-800"
+                  : course.subType === "Gold"
+                  ? "bg-yellow-100 text-yellow-800"
+                  : "bg-gray-100 text-gray-800"
+              }`}
+            >
+              {course.subType}
+            </span>
+          </div>
         </div>
       </div>
     </Card>

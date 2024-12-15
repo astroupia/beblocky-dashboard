@@ -12,6 +12,7 @@ import { SignedOut } from "@clerk/nextjs";
 import { SignedIn } from "@clerk/nextjs";
 import Image from "next/image";
 import Logo from "@/public/assets/images/logo.png";
+import { CourseCreationFlow } from "@/components/courses/course-creation-flow";
 
 interface HeaderProps {
   page: string;
@@ -28,6 +29,7 @@ export default function Header({
 }: HeaderProps) {
   const { user } = useUser();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [isCreationFlowOpen, setIsCreationFlowOpen] = useState(false);
 
   return (
     <div className="flex justify-between items-center mb-8">
@@ -46,16 +48,10 @@ export default function Header({
         {page === "courses" ? (
           <>
             <Button
-              onClick={() => setShowCreateDialog(true)}
+              onClick={() => setIsCreationFlowOpen(true)}
               className="bg-primary hover:bg-primary/90 text-white"
             >
               Add New Course
-            </Button>
-            <Button
-              onClick={() => setShowCreateDialog(true)}
-              className="bg-primary hover:bg-primary/90 text-white"
-            >
-              Edit Course
             </Button>
           </>
         ) : (
@@ -87,9 +83,10 @@ export default function Header({
         </SignedOut>
       </div>
 
-      <CreateCourseDialog
-        open={showCreateDialog}
-        onOpenChange={setShowCreateDialog}
+      <CourseCreationFlow
+        open={isCreationFlowOpen}
+        onOpenChange={setIsCreationFlowOpen}
+        mode="create"
       />
     </div>
   );

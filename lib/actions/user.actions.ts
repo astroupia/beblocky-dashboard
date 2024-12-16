@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { connectToDatabase } from "@/lib/database";
-import { CreateUserParams, UpdateUserParams } from "@/types";
+import { CreateUserParams, UpdateUserParams } from "@/types/user";
 import User from "@/lib/models/user.model"; // Import the User model
 
 // Creates a new user in the database

@@ -11,10 +11,16 @@ const CourseSchema = new Schema(
     lessons: [{ type: Schema.Types.ObjectId, ref: "Lesson" }], // Array of lessons
     subType: {
       type: String,
-      enum: ["F", "S", "P", "G"],
+      enum: ["Free", "Standard", "Premium", "Gold"],
       required: true,
-      default: "F",
+      default: "Free",
     }, // Subscribtion type of course (e.g., "Free" or "Standard", "Gold")
+    status: {
+      type: String,
+      enum: ["Active", "Draft"],
+      required: true,
+      default: "Draft",
+    },
   },
   { timestamps: true } // Automatically manage `createdAt` and `updatedAt`
 );

@@ -4,24 +4,27 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import Image from "next/image";
+import Logo from "@/public/assets/images/logo.png";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <nav className="bg-white/80 backdrop-blur-md border-b border-gray-100 fixed w-full z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link
-              href="/"
-              className="flex items-center space-x-2 text-primary hover:text-primary/90"
-            >
-              <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
-                <span className="text-white font-bold">D</span>
-              </div>
-              <span className="font-bold text-xl">DashPro</span>
-            </Link>
+            <div className="flex items-center">
+              <Link href="/">
+                <Image
+                  src={Logo}
+                  alt="Beblocky logo"
+                  height={100}
+                  width={150}
+                />
+              </Link>
+            </div>
           </div>
 
           {/* Desktop Navigation */}
@@ -29,11 +32,8 @@ export function Navbar() {
             <Link href="#features" className="text-gray-600 hover:text-primary">
               Features
             </Link>
-            <Link
-              href="#testimonials"
-              className="text-gray-600 hover:text-primary"
-            >
-              Testimonials
+            <Link href="/docs" className="text-gray-600 hover:text-primary">
+              Docs
             </Link>
             <Link href="#pricing" className="text-gray-600 hover:text-primary">
               Pricing

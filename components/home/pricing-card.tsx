@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 interface PricingCardProps {
   title: string;
   price: string;
@@ -16,7 +18,7 @@ export function PricingCard({
   return (
     <div
       className={`bg-white rounded-xl shadow-md p-6 ${
-        isPopular ? "ring-2 ring-primary" : ""
+        isPopular ? "ring-2 ring-secondary" : ""
       }`}
     >
       {isPopular && (
@@ -47,15 +49,17 @@ export function PricingCard({
           </li>
         ))}
       </ul>
-      <button
-        className={`w-full py-2 px-4 rounded-md font-medium ${
-          isPopular
-            ? "bg-primary text-white hover:bg-primary/90"
-            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-        }`}
-      >
-        Get Started
-      </button>
+      <Link href="/sign-in">
+        <button
+          className={`w-full py-2 px-4 rounded-md font-medium ${
+            isPopular
+              ? "bg-primary text-white hover:bg-primary/90"
+              : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+          }`}
+        >
+          Get Started
+        </button>
+      </Link>
     </div>
   );
 }

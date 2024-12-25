@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -22,47 +22,81 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ManageLessons } from "./manage-lessons";
 import { ManageSlides } from "@/components/courses/dialogs/manage-slides";
+import { editCourse, createCourse } from "@/lib/actions/course.actions";
+import { CreateCourseParam, UpdateCourseParam } from "@/types/course";
 
 interface EditCourseDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   mode: "edit" | "create";
-  course?: Course;
+  course?: Course; // Make course optional
   embedded?: boolean;
   onComplete?: (data: Course) => void;
 }
 
 interface Course {
-  id: number;
-  courseId: number;
+  _id?: string; // Optional for creation
   courseTitle: string;
   courseDescription: string;
   courseLanguage: string;
   subType: "Free" | "Premium" | "Standard" | "Gold";
+  slides?: string[];
+  lessons?: string[];
+  status: "Draft" | "Active";
 }
+
+const useCourseForm = (course?: Course) => {
+  const [formData, setFormData] = useState<Course>({
+    _id: course?._id || "",
+    courseTitle: course?.courseTitle || "",
+    courseDescription: course?.courseDescription || "",
+    courseLanguage: course?.courseLanguage || "",
+    subType: course?.subType || "Free",
+    status: course?.status || "Draft",
+  });
+
+  useEffect(() => {
+    if (course) {
+      setFormData({
+        _id: course._id,
+        courseTitle: course.courseTitle,
+        courseDescription: course.courseDescription,
+        courseLanguage: course.courseLanguage,
+        subType: course.subType,
+        status: course.status,
+      });
+    }
+  }, [course]);
+
+  return [formData, setFormData] as const;
+};
 
 export function EditCourseDialog({
   open,
   onOpenChange,
   course,
   mode,
+  onComplete,
 }: EditCourseDialogProps) {
-  const [activeTab, setActiveTab] = useState("basics");
-  const [formData, setFormData] = useState<Course>(
-    course || {
-      id: 0,
-      courseId: 0,
-      courseTitle: "",
-      courseDescription: "",
-      courseLanguage: "",
-      subType: "Free",
-    }
-  );
+  const [formData, setFormData] = useCourseForm(course);
+  const [activeTab, setActiveTab] = useState<string>("basics");
+  const [status, setStatus] = useState(formData.status);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle course update/creation logic here
-    console.log("Saving course:", formData);
+    const createCourseParam: CreateCourseParam = {
+      _id: formData._id,
+      courseTitle: formData.courseTitle,
+      courseDescription: formData.courseDescription,
+      courseLanguage: formData.courseLanguage,
+      slides: formData.slides || undefined,
+      lessons: null,
+      subType: formData.subType,
+      status: status,
+    };
+
+    if (onComplete) onComplete(createCourseParam);
+    onOpenChange(false);
   };
 
   return (
@@ -85,22 +119,6 @@ export function EditCourseDialog({
           <TabsContent value="basics">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="courseId">Course ID</Label>
-                <Input
-                  id="courseId"
-                  type="number"
-                  value={formData.courseId}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      courseId: parseInt(e.target.value),
-                    })
-                  }
-                  placeholder="Enter course ID"
-                />
-              </div>
-
-              <div>
                 <Label htmlFor="courseTitle">Course Title</Label>
                 <Input
                   id="courseTitle"
@@ -112,6 +130,7 @@ export function EditCourseDialog({
                     })
                   }
                   placeholder="Enter course title"
+                  required
                 />
               </div>
 
@@ -128,6 +147,7 @@ export function EditCourseDialog({
                   }
                   placeholder="Enter course description"
                   rows={4}
+                  required
                 />
               </div>
 
@@ -143,16 +163,26 @@ export function EditCourseDialog({
                     })
                   }
                   placeholder="Enter course language"
+                  required
                 />
               </div>
 
               <div>
                 <Label htmlFor="subType">Subscription Type</Label>
                 <Select
-                  value={formData.subType}
-                  onValueChange={(
-                    value: "Free" | "Premium" | "Standard" | "Gold"
-                  ) => setFormData({ ...formData, subType: value })}
+                  value={
+                    formData.subType as "Free" | "Premium" | "Standard" | "Gold"
+                  }
+                  onValueChange={(value) =>
+                    setFormData({
+                      ...formData,
+                      subType: value as
+                        | "Free"
+                        | "Premium"
+                        | "Standard"
+                        | "Gold",
+                    })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select subscription type" />
@@ -166,6 +196,36 @@ export function EditCourseDialog({
                 </Select>
               </div>
 
+              <div>
+                <Label htmlFor="status">Status</Label>
+                <Select
+                  value={status}
+                  onValueChange={(value) => {
+                    setStatus(value as "Active" | "Draft");
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="Draft">Draft</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {status === "Active" && (
+                <div>
+                  <p>Active-specific content goes here.</p>
+                </div>
+              )}
+
+              {status === "Draft" && (
+                <div>
+                  <p>Draft-specific content goes here.</p>
+                </div>
+              )}
+
               <DialogFooter>
                 <Button
                   type="button"
@@ -174,17 +234,19 @@ export function EditCourseDialog({
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Save Changes</Button>
+                <Button type="submit">
+                  {mode === "edit" ? "Save Changes" : "Create Course"}
+                </Button>
               </DialogFooter>
             </form>
           </TabsContent>
 
           <TabsContent value="lessons">
-            <ManageLessons courseId={formData.courseId} />
+            <ManageLessons courseId={formData._id || ""} />
           </TabsContent>
 
           <TabsContent value="slides">
-            <ManageSlides courseId={formData.courseId} />
+            <ManageSlides courseId={formData._id || ""} />
           </TabsContent>
 
           <TabsContent value="publish">

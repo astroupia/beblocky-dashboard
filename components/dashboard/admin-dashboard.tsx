@@ -1,7 +1,6 @@
 "use client";
 
 import Header from "@/components/dashboard/header";
-import Sidebar from "@/components/dashboard/sidebar";
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -121,10 +120,15 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-[#892FFF] to-[#FF932C] dark:from-gray-900 dark:to-gray-800">
-      <Sidebar theme={theme} toggleTheme={toggleTheme} />
-      <div className="flex-1 overflow-y-auto">
-        <Header />
+    <div className="min-h-screen p-8 bg-white dark:bg-gray-900 rounded-md">
+      {/* <Sidebar theme={theme} toggleTheme={toggleTheme} /> */}
+      <div className="container mx-auto overflow-y-auto">
+        <Header
+          page={"admin"}
+          header={"Admin Dashboard"}
+          theme={theme}
+          toggleTheme={toggleTheme}
+        />
         <main className="p-4 sm:p-6 lg:p-8">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <Card className="bg-white dark:bg-gray-800">

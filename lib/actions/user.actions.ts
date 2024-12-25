@@ -2,13 +2,19 @@
 
 import { revalidatePath } from "next/cache";
 import { connectToDatabase } from "@/lib/database";
-import { CreateUserParams, UpdateUserParams } from "@/types";
+import { CreateUserParams, UpdateUserParams } from "@/types/user";
 import User from "@/lib/models/user.model"; // Import the User model
 
 // Creates a new user in the database
 export async function createUser(userData: CreateUserParams) {
   await connectToDatabase();
   return await User.create(userData);
+}
+
+export async function getAllUsers() {
+  await connectToDatabase();
+  const users = await User.find({});
+  return users;
 }
 
 // Retrieves a user by their Clerk ID
@@ -31,7 +37,7 @@ export async function updateUser(clerkId: string, user: UpdateUserParams) {
 export async function getUserRole(userId: string): Promise<string> {
   await connectToDatabase();
   const user = await User.findOne({ clerkId: userId });
-  return user?.role || "customer";
+  return user?.role || "teacher";
 }
 
 // Deletes a user from the database

@@ -7,9 +7,6 @@ export default function layout({ children }: { children: React.ReactNode }) {
       <ClerkProvider>
         <body>
           <div className="flex min-h-screen">
-            <div className="flex-none p-4">
-              <BrandDesign />
-            </div>
             <div className="flex-grow">{children}</div>
           </div>
         </body>

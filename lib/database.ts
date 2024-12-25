@@ -1,32 +1,29 @@
 import mongoose from "mongoose";
 
-let isConnected: boolean = false;
+const MONGODB_URI = process.env.MONGODB_URI;
 
-// Connects to the MongoDB database
+let cached = (global as any).mongoose || { conn: null, promise: null };
+
 export const connectToDatabase = async () => {
-  if (isConnected) return;
+  if (cached.conn) return cached.conn;
 
-  const dbUrl = process.env.MONGODB_URL;
-  const dbName = "beblocky-admin";
+  if (!MONGODB_URI) throw new Error("MONGODB_URI is missing");
 
-  if (!dbUrl)
-    throw new Error("MongoDB URL is not defined in environment variables");
-
-  try {
-    const db = await mongoose.connect(dbUrl, { dbName });
-    isConnected = true;
-  } catch (error) {
-    console.error("Error connecting to database:", error);
-    throw error;
+  cached.promise =
+    cached.promise ||
+    mongoose.connect(MONGODB_URI, {
+      dbName: "beblocky-admin",
+      bufferCommands: false,
+    });
+  cached.conn = await cached.promise;
+  if (mongoose.connection.db) {
+    console.log(
+      `Connected to database: ${mongoose.connection.db.databaseName}`
+    );
+  } else {
+    console.log("Database connection failed");
   }
+  console.log("Mongoose Connection State:", mongoose.connection.readyState);
+  console.log("Available Models:", mongoose.models);
+  return cached.conn;
 };
-
-export class ObjectId {
-  constructor(id?: string) {
-    return new mongoose.Types.ObjectId(id);
-  }
-}
-
-export function serializeObjectId(id: mongoose.Types.ObjectId): string {
-  return id.toString();
-}

@@ -6,6 +6,7 @@ import { FeatureCard } from "@/components/home/feature-card";
 import { TestimonialCard } from "@/components/home/testimonial-card";
 import { PricingCard } from "@/components/home/pricing-card";
 import Link from "next/link";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
 
 export default function HomePage() {
   return (
@@ -16,23 +17,36 @@ export default function HomePage() {
       <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 mb-6">
-            Powerful Analytics for Your{" "}
-            <span className="text-primary">Business Growth</span>
+            Powerful Analytics for{" "}
+            <span className="text-primary">
+              <span className="text-secondary">Tracking Courses and </span>{" "}
+              Student&#39;s Growth
+            </span>
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Transform your business data into actionable insights with our
-            comprehensive dashboard solution.
+            Transform learning data into actionable insights with comprehensive
+            dashboard solution.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/sign-in"
-              className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary/90"
-            >
-              Get Started
-            </Link>
+            <SignedIn>
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-secondary/90"
+              >
+                Go to Dashboard
+              </Link>
+            </SignedIn>
+            <SignedOut>
+              <Link
+                href="/sign-in"
+                className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary/90"
+              >
+                Get Started
+              </Link>
+            </SignedOut>
             <Link
               href="#features"
-              className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-primary/90 hover:text-white"
             >
               Learn More
             </Link>
@@ -58,30 +72,16 @@ export default function HomePage() {
               title="Real-time Analytics"
               description="Get instant insights with real-time data analytics and monitoring capabilities."
             />
-            <FeatureCard
-              icon={Shield}
-              title="Enterprise Security"
-              description="Bank-grade security to keep your data safe and protected at all times."
-            />
+
             <FeatureCard
               icon={Zap}
               title="Lightning Fast"
-              description="Optimized for speed and performance to help you work efficiently."
+              description="Optimized for speed and performance to for work efficiency."
             />
             <FeatureCard
               icon={LineChart}
               title="Advanced Reports"
-              description="Detailed reports and analytics to track your business growth."
-            />
-            <FeatureCard
-              icon={Users}
-              title="Team Collaboration"
-              description="Work together with your team in real-time with collaborative tools."
-            />
-            <FeatureCard
-              icon={Clock}
-              title="24/7 Support"
-              description="Round-the-clock support to help you whenever you need assistance."
+              description="Detailed reports and analytics to track Students' Growth."
             />
           </div>
         </div>
@@ -135,41 +135,45 @@ export default function HomePage() {
               Choose the perfect plan for your business needs
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <PricingCard
-              title="Starter"
-              price="$29/mo"
+              title="Free"
+              price="0/mo ETB"
               description="Perfect for small businesses"
+              features={["Basic Courses", "24/7 support", "IDE Access"]}
+            />
+            <PricingCard
+              title="Standard"
+              price="10,000/mo ETB"
+              description="For More than 5 Students"
               features={[
-                "Up to 5 team members",
-                "Basic analytics",
-                "24/7 support",
-                "1GB storage",
+                "More Courses",
+                "Priority support",
+                "More IDE Features",
+                "Custom reports",
               ]}
             />
             <PricingCard
-              title="Professional"
-              price="$99/mo"
-              description="For growing businesses"
+              title="Gold"
+              price="25,000/mo ETB"
+              description="For Small Schools"
               features={[
-                "Up to 20 team members",
-                "Advanced analytics",
-                "Priority support",
-                "10GB storage",
-                "Custom reports",
+                "More than 50 Students'",
+                "Advanced Courses",
+                "24/7 priority support",
+                "Custom development",
               ]}
               isPopular
             />
             <PricingCard
-              title="Enterprise"
-              price="$299/mo"
-              description="For large organizations"
+              title="Premium"
+              price="50,000/mo ETB"
+              description="For Large Schools"
               features={[
-                "Unlimited team members",
-                "Advanced analytics",
+                "More than 100 Students'",
+                "All Courses",
                 "24/7 priority support",
-                "Unlimited storage",
-                "Custom development",
+                "Custom development of Courses",
               ]}
             />
           </div>

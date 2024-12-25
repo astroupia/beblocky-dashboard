@@ -47,7 +47,7 @@ export default function UserManagementPage() {
               <h3 className="font-semibold mb-2">Adding New Users</h3>
               <ol className="list-decimal pl-6 text-muted-foreground space-y-2">
                 <li>Navigate to User Management</li>
-                <li>Click "Add User"</li>
+                <li>Click &ldquo;Add User&ldquo;</li>
                 <li>Enter user details</li>
                 <li>Assign appropriate role</li>
                 <li>Set initial password</li>

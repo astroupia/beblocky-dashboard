@@ -13,7 +13,7 @@ interface Lesson {
 }
 
 interface ManageLessonsProps {
-  courseId: number;
+  courseId: string;
 }
 
 export function ManageLessons({ courseId }: ManageLessonsProps) {

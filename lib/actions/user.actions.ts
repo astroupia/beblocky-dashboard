@@ -11,6 +11,12 @@ export async function createUser(userData: CreateUserParams) {
   return await User.create(userData);
 }
 
+export async function getAllUsers() {
+  await connectToDatabase();
+  const users = await User.find({});
+  return users;
+}
+
 // Retrieves a user by their Clerk ID
 export async function getUserById(userId: string) {
   await connectToDatabase();

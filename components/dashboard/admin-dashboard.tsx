@@ -121,7 +121,7 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen p-8 bg-white dark:from-gray-900 dark:to-gray-800 rounded-md">
+    <div className="min-h-screen p-8 bg-white dark:bg-gray-900 rounded-md">
       {/* <Sidebar theme={theme} toggleTheme={toggleTheme} /> */}
       <div className="container mx-auto overflow-y-auto">
         <Header

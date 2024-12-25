@@ -1,9 +1,10 @@
-import { Schema, model, models } from "mongoose";
+import mongoose, { Schema, model, models } from "mongoose";
 
+console.log("Defining Course Model");
 // Course Schema
 const CourseSchema = new Schema(
   {
-    id: { type: Number, required: true, unique: true }, // Unique identifier for the course
+    _id: { type: Number, required: true, unique: true }, // Unique identifier for the course
     courseTitle: { type: String, required: true }, // Title of the course
     courseDescription: { type: String, required: true }, // Description of the course
     courseLanguage: { type: String, required: true }, // Language of the course
@@ -26,5 +27,4 @@ const CourseSchema = new Schema(
 );
 
 const Course = models.Course || model("Course", CourseSchema);
-
 export default Course;

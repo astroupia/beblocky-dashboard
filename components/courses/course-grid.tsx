@@ -113,7 +113,7 @@ export function CourseGrid() {
       <EditCourseDialog
         open={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
-        course={editingCourse || undefined}
+        course={editingCourse}
         mode={editingCourse ? "edit" : "create"}
       />
 

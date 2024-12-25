@@ -10,6 +10,9 @@ export async function getAllCourse() {
       return;
     }
     const courses = await Course.find({});
+    if (!courses) {
+      console.log("No Courses");
+    }
     return courses;
   } catch (error) {
     console.log("Error getting Courses", error);
@@ -24,6 +27,9 @@ export async function getAllActiveCourse() {
       return;
     }
     const courses = await Course.find({ status: "Active" });
+    if (!courses) {
+      console.log("No Courses");
+    }
     return courses;
   } catch (error) {
     console.log("Error getting Courses", error);
@@ -31,13 +37,16 @@ export async function getAllActiveCourse() {
 }
 
 export async function createCourse(createCourseParam: CreateCourseParam) {
+  const conn = await connectToDatabase();
+  if (!conn) {
+    console.log("Error connecting to database");
+    return;
+  }
+
   try {
-    const conn = await connectToDatabase();
-    if (!conn) {
-      console.log("Error connecting to database");
-      return;
-    }
-    const newCourse = await Course.create(createCourseParam);
+    const newCourse = new Course(createCourseParam);
+    console.log("Created Instance");
+    await newCourse.save();
     return newCourse;
   } catch (error) {
     console.log("Error Creating Course: ", error);

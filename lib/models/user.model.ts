@@ -14,6 +14,7 @@ const UserSchema = new Schema(
       required: true,
       default: "teacher",
     },
+    createdAt: {type: String, required: true};
   },
   { discriminatorKey: "role", timestamps: true }
 );

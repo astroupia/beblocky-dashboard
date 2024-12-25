@@ -5,8 +5,8 @@ import { createCourse } from "@/lib/actions/course.actions";
 import { CreateCourseParam } from "@/types/course";
 import React from "react";
 
-export async function page() {
+const CoursesPage = () => {
   return <CourseDashboardPage />;
-}
+};
 
-export default page;
+export default CoursesPage;

@@ -21,7 +21,7 @@ interface Slide {
 }
 
 interface ManageSlidesProps {
-  courseId: number;
+  courseId: string;
 }
 
 export function ManageSlides({ courseId }: ManageSlidesProps) {

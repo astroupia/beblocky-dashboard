@@ -123,7 +123,7 @@ export function CourseCreationFlow({
             course={
               courseData ? { ...courseData, status: "Active" } : undefined
             }
-            onComplete={handleCourseComplete as (data: Course) => void}
+            // onComplete={handleCourseComplete as (data: Course & { id: string, courseId: string }) => void}
             embedded
           />
         )}

@@ -89,8 +89,8 @@ export function EditCourseDialog({
       courseTitle: formData.courseTitle,
       courseDescription: formData.courseDescription,
       courseLanguage: formData.courseLanguage,
-      slides: formData.slides || undefined,
-      lessons: null,
+      // slides: formData.slides || undefined,
+      // lessons: null,
       subType: formData.subType,
       status: status,
     };

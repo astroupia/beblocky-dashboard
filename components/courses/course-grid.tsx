@@ -21,7 +21,7 @@ interface Course {
   subType: "Free" | "Premium" | "Standard" | "Gold";
   students: number;
   progress: number;
-  status: string;
+  status: "Active" | "Draft";
 }
 
 const courses: Course[] = [
@@ -62,7 +62,7 @@ const courses: Course[] = [
 
 export function CourseGrid() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+  const [editingCourse, setEditingCourse] = useState<Course | undefined>();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null);
@@ -200,10 +200,10 @@ function CourseCard({ course, onEdit, onDelete }: CourseCardProps) {
                 course.subType === "Premium"
                   ? "bg-purple-100 text-purple-800"
                   : course.subType === "Standard"
-                  ? "bg-blue-100 text-blue-800"
-                  : course.subType === "Gold"
-                  ? "bg-yellow-100 text-yellow-800"
-                  : "bg-gray-100 text-gray-800"
+                    ? "bg-blue-100 text-blue-800"
+                    : course.subType === "Gold"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-gray-100 text-gray-800"
               }`}
             >
               {course.subType}

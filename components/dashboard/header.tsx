@@ -5,7 +5,6 @@ import { Bell } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { CreateCourseDialog } from "@/components/courses/create-course-dialog"; // Adjust the import based on your structure
 import { SignInButton, useUser } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
 import { SignedOut } from "@clerk/nextjs";
@@ -38,6 +37,7 @@ export default function Header({
           <h1 className="text-4xl font-bold text-primary">{header}</h1>
           <p className="text-muted-foreground">Manage your admin settings</p>
         </div>
+        <h4 className="text-gray-400">&gt;home</h4>
         {/* <div className="flex items-center">
           <Link href="/">
             <Image src={Logo} alt="Beblocky logo" className="p-4 h-20 w-50" />

@@ -4,7 +4,7 @@ export type CreateUserParams = {
   role?: string;
   firstName: string;
   lastName: string;
-  createdAt: string;
+  createdAt: number;
 };
 
 export type UpdateUserParams = {

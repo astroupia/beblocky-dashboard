@@ -2,6 +2,7 @@ import { Schema, model, models } from "mongoose";
 
 const SlideSchema = new Schema(
   {
+    _id: { type: String, unique: true, required: true },
     courseId: { type: Schema.Types.ObjectId, ref: "Course" },
     lessonId: { type: Schema.Types.ObjectId, ref: "Lesson" },
     backgroundColor: { type: String, required: false },

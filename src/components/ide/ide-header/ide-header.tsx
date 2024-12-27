@@ -44,14 +44,14 @@ const IdePageHeader: React.FC = () => {
             <Image
               src={Logo}
               alt="BeBlocky Logo"
-              className={cn(styles["header-image"], "h-35 w-25")}
+              className={cn(styles["header-image"])}
             />
           )}
           {isNight && (
             <Image
               src={Logo}
               alt="BeBlocky Logo"
-              className={cn(styles["header-image"], "h-35 w-35")}
+              className={cn(styles["header-image"], "h-35 w-54")}
             />
           )}
         </Link>

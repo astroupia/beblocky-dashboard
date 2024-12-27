@@ -1,9 +1,10 @@
 .header-container {
-  height: 6vh;
+  height: 7.5vh;
   width: 100vw;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  items-align: center;
   font-size: 1.75rem;
   padding: 0.5rem;
   transition: linear 0.3s;

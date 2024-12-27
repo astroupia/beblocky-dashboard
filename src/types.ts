@@ -30,7 +30,7 @@ export interface Student {
 export interface Classroom {
   uid: string;
   name: string;
-  courses: string[];
+  courses?: string[];
 }
 
 export interface School {
@@ -56,4 +56,26 @@ export interface Achievement {
   description: string;
   dateEarned: Date;
   type: "CODING_STREAK" | "MASTERY_LEVEL" | "CHALLENGE_COMPLETE";
+}
+
+export interface Student {
+  userName: string;
+  email: string;
+  classroom: string;
+  parentId: string;
+  courses?: string[];
+  name: string;
+  userId: string;
+}
+
+export interface Classroom {
+  userId: string;
+  courses?: string[];
+  name: string;
+}
+
+export interface UserData {
+  role: "student";
+  student: Student;
+  classroom: Classroom;
 }

@@ -3,7 +3,6 @@ import { unique } from "next/dist/build/utils";
 
 const LessonSchema = new Schema(
   {
-    _id: { type: String, unique: true, required: true },
     courseId: { type: Schema.Types.ObjectId, ref: "Course" },
     lessonTitle: { type: String, required: true }, // Add necessary fields for lessons
     lessonDescription: { type: String, required: false },

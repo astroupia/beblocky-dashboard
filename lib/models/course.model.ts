@@ -4,7 +4,6 @@ console.log("Defining Course Model");
 // Course Schema
 const CourseSchema = new Schema(
   {
-    _id: { type: Number, required: true, unique: true }, // Unique identifier for the course
     courseTitle: { type: String, required: true }, // Title of the course
     courseDescription: { type: String, required: true }, // Description of the course
     courseLanguage: { type: String, required: true }, // Language of the course

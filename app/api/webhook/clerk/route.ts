@@ -57,13 +57,14 @@ export async function POST(req: Request) {
   console.log(`Received event ${eventType}`);
 
   if (eventType === "user.created") {
-    const { id, email_addresses, first_name, last_name } = evt.data;
+    const { id, email_addresses, first_name, last_name, created_at } = evt.data;
     const user = {
       clerkId: id,
       email: email_addresses[0]?.email_address,
       firstName: first_name || "",
       lastName: last_name || "",
-      role: "customer",
+      role: "teacher",
+      createdAt: created_at,
     };
 
     try {

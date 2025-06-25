@@ -1,12 +1,32 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export default clerkMiddleware();
+// Add paths that should be accessible without authentication
+const publicPaths = ["/sign-in", "/sign-up"];
 
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Check if the path is public
+  const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
+
+  // Check for better-auth session token
+  const sessionToken = request.cookies.get("better-auth.session_token")?.value;
+
+  // If not logged in and trying to access protected page
+  if (!sessionToken && !isPublicPath) {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
+
+  // If already logged in and accessing login/signup, redirect home
+  if (sessionToken && isPublicPath) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  return NextResponse.next();
+}
+
+// Configure which paths the middleware should run on
 export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };

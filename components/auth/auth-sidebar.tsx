@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { BookOpen, Shield, Zap } from "lucide-react"
-import { AuthFeature } from "./auth-feature"
+import { motion } from "framer-motion";
+import { BookOpen, Shield, Zap } from "lucide-react";
+import { AuthFeature } from "./auth-feature";
 
 interface AuthSidebarProps {
-  mode: "signin" | "signup"
+  mode: "signin" | "signup";
 }
 
 export function AuthSidebar({ mode }: AuthSidebarProps) {
@@ -62,22 +62,31 @@ export function AuthSidebar({ mode }: AuthSidebarProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
       >
-        <div className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-primary/10 shadow-lg">
+        <div className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-primary/10 shadow-lg mb-6">
           <p className="text-slate-600 dark:text-slate-300 mb-4">
-            "This platform has completely transformed how we deliver education. The course creation tools are
-            incredible."
+            "This platform has completely transformed how we deliver education.
+            The course creation tools are incredible."
           </p>
           <div className="flex items-center space-x-3">
             <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
               <span className="text-white font-semibold text-sm">SJ</span>
             </div>
             <div>
-              <p className="font-semibold text-slate-900 dark:text-white">Sarah Johnson</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Education Director</p>
+              <p className="font-semibold text-slate-900 dark:text-white">
+                Sarah Johnson
+              </p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Education Director
+              </p>
             </div>
           </div>
         </div>
+        <img
+          src="/auth-content.png"
+          alt="Auth Content Illustration"
+          className="w-full max-w-xs mx-auto rounded-xl shadow-lg"
+        />
       </motion.div>
     </motion.div>
-  )
+  );
 }

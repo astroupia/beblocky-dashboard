@@ -1,22 +1,22 @@
-import { ClerkProvider, SignedOut, SignedIn } from "@clerk/nextjs";
+import type { Metadata } from "next";
 import "./globals.css";
-import { Metadata } from "next";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
-  title: "Beblocky Admin Dashboard",
-  description: "Analytics Oriented",
+  title: "Beblocky Dashboard",
+  description: "A modern course management dashboard.",
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en">
-      <ClerkProvider>
-        <body>{children}</body>
-      </ClerkProvider>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

@@ -38,6 +38,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import logo from "@/lib/images/logo.png";
 
 // Placeholder SVG component for avatar
 const PlaceholderAvatar = () => (
@@ -111,12 +112,7 @@ export function ModernNavbar() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-3 group">
-              <Image
-                src="/assets/images/logo.png"
-                alt="Beblocky Logo"
-                width={180}
-                height={180}
-              />
+              <Image src={logo} alt="Beblocky Logo" width={180} height={180} />
             </Link>
           </div>
 

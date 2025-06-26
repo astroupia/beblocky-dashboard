@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { BookOpen, Shield, Zap } from "lucide-react";
 import { AuthFeature } from "./auth-feature";
 import Image from "next/image";
+import authContent from "@/lib/images/auth-content.jpg";
 
 interface AuthSidebarProps {
   mode: "signin" | "signup";
@@ -58,15 +59,15 @@ export function AuthSidebar({ mode }: AuthSidebarProps) {
           transition={{ delay: 0.6, duration: 0.5 }}
         >
           <Image
-            src="/assets/images/auth-content.jpg"
+            src={authContent}
             alt="Learning platform illustration"
-            layout="fill"
-            objectFit="cover"
+            fill
+            style={{ objectFit: "cover" }}
             className="transition-transform duration-500 hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent flex items-end p-6">
             <h2 className="text-white text-2xl font-bold drop-shadow-lg">
-              Empower Your Education
+              Make Coding Fun for Every Kid
             </h2>
           </div>
         </motion.div>

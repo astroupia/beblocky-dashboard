@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun } from "lucide-react";
 import Image from "next/image";
+import logo from "@/lib/images/logo.png";
 
 interface AuthHeaderProps {
   mode: "signin" | "signup";
@@ -30,12 +31,7 @@ export function AuthHeader({ mode }: AuthHeaderProps) {
     <header className="w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
       <div className="container flex items-center justify-between h-16 px-4">
         <Link href="/" className="flex items-center space-x-3 group">
-          <Image
-            src="/assets/images/logo.png"
-            alt="Beblocky Logo"
-            width={180}
-            height={180}
-          />
+          <Image src={logo} alt="Beblocky Logo" width={180} height={180} />
         </Link>
 
         <div className="flex items-center gap-4">

@@ -1,40 +1,41 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Moon, Sun } from "lucide-react"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Moon, Sun } from "lucide-react";
+import Image from "next/image";
 
 interface AuthHeaderProps {
-  mode: "signin" | "signup"
+  mode: "signin" | "signup";
 }
 
 export function AuthHeader({ mode }: AuthHeaderProps) {
-  const [theme, setTheme] = useState("light")
+  const [theme, setTheme] = useState("light");
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "light"
-    setTheme(savedTheme)
-    document.documentElement.classList.toggle("dark", savedTheme === "dark")
-  }, [])
+    const savedTheme = localStorage.getItem("theme") || "light";
+    setTheme(savedTheme);
+    document.documentElement.classList.toggle("dark", savedTheme === "dark");
+  }, []);
 
   const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light"
-    setTheme(newTheme)
-    localStorage.setItem("theme", newTheme)
-    document.documentElement.classList.toggle("dark", newTheme === "dark")
-  }
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
+  };
 
   return (
     <header className="w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
       <div className="container flex items-center justify-between h-16 px-4">
         <Link href="/" className="flex items-center space-x-3 group">
-          <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-            <span className="text-white font-bold text-lg">B</span>
-          </div>
-          <span className="font-bold text-2xl bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-            Beblocky
-          </span>
+          <Image
+            src="/assets/images/logo.png"
+            alt="Beblocky Logo"
+            width={180}
+            height={180}
+          />
         </Link>
 
         <div className="flex items-center gap-4">
@@ -60,5 +61,5 @@ export function AuthHeader({ mode }: AuthHeaderProps) {
         </div>
       </div>
     </header>
-  )
+  );
 }

@@ -43,12 +43,6 @@ export function AuthSidebar({ mode }: AuthSidebarProps) {
             delay={0.3}
           />
           <AuthFeature
-            icon={Shield}
-            title="Enterprise Security"
-            description="Your data is protected with enterprise-grade security measures"
-            delay={0.4}
-          />
-          <AuthFeature
             icon={Zap}
             title="Real-time Analytics"
             description="Track student progress and course performance in real-time"
@@ -64,7 +58,7 @@ export function AuthSidebar({ mode }: AuthSidebarProps) {
           transition={{ delay: 0.6, duration: 0.5 }}
         >
           <Image
-            src="/assets/images/auth-contetn.png"
+            src="/assets/images/auth-content.jpg"
             alt="Learning platform illustration"
             layout="fill"
             objectFit="cover"

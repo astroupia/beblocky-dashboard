@@ -1,11 +1,12 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { BookOpen, Shield, Zap } from "lucide-react"
-import { AuthFeature } from "./auth-feature"
+import { motion } from "framer-motion";
+import { BookOpen, Shield, Zap } from "lucide-react";
+import { AuthFeature } from "./auth-feature";
+import Image from "next/image";
 
 interface AuthSidebarProps {
-  mode: "signin" | "signup"
+  mode: "signin" | "signup";
 }
 
 export function AuthSidebar({ mode }: AuthSidebarProps) {
@@ -34,7 +35,7 @@ export function AuthSidebar({ mode }: AuthSidebarProps) {
           </p>
         </motion.div>
 
-        <div className="space-y-8">
+        <div className="space-y-8 mb-12">
           <AuthFeature
             icon={BookOpen}
             title="Course Management"
@@ -54,30 +55,55 @@ export function AuthSidebar({ mode }: AuthSidebarProps) {
             delay={0.5}
           />
         </div>
-      </div>
 
-      <motion.div
-        className="relative z-10"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-      >
-        <div className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-primary/10 shadow-lg">
-          <p className="text-slate-600 dark:text-slate-300 mb-4">
-            "This platform has completely transformed how we deliver education. The course creation tools are
-            incredible."
-          </p>
-          <div className="flex items-center space-x-3">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-              <span className="text-white font-semibold text-sm">SJ</span>
-            </div>
-            <div>
-              <p className="font-semibold text-slate-900 dark:text-white">Sarah Johnson</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Education Director</p>
+        {/* New Image Section */}
+        <motion.div
+          className="relative w-full h-64 rounded-2xl overflow-hidden shadow-xl mb-12"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
+        >
+          <Image
+            src="/assets/images/auth-contetn.png"
+            alt="Learning platform illustration"
+            layout="fill"
+            objectFit="cover"
+            className="transition-transform duration-500 hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent flex items-end p-6">
+            <h2 className="text-white text-2xl font-bold drop-shadow-lg">
+              Empower Your Education
+            </h2>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="relative z-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+        >
+          <div className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-primary/10 shadow-lg">
+            <p className="text-slate-600 dark:text-slate-300 mb-4">
+              "This platform has completely transformed how we deliver
+              education. The course creation tools are incredible."
+            </p>
+            <div className="flex items-center space-x-3">
+              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+                <span className="text-white font-semibold text-sm">SJ</span>
+              </div>
+              <div>
+                <p className="font-semibold text-slate-900 dark:text-white">
+                  Sarah Johnson
+                </p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Education Director
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </motion.div>
-  )
+  );
 }

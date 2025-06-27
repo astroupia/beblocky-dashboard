@@ -191,11 +191,10 @@ export function ModernEditCourseDialog({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="English">English</SelectItem>
-                        <SelectItem value="Spanish">Spanish</SelectItem>
-                        <SelectItem value="French">French</SelectItem>
-                        <SelectItem value="German">German</SelectItem>
-                        <SelectItem value="Chinese">Chinese</SelectItem>
+                        <SelectItem value="English">HTML</SelectItem>
+                        <SelectItem value="Spanish">Python</SelectItem>
+                        <SelectItem value="French">Javascript</SelectItem>
+                        <SelectItem value="German">Typescript</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

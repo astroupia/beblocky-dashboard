@@ -35,6 +35,7 @@ import { ISlide, ICreateSlideDto } from "@/types/slide";
 import { toast } from "sonner";
 import { Types } from "mongoose";
 import { useRouter } from "next/navigation";
+import { CourseEditorPageSkeleton } from "./loading/course-edit-skeleton";
 
 interface ClientCourse extends ICourse {
   _id: string;
@@ -623,7 +624,9 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
   const handleUpdateSlide = async (
     slideId: string,
     updatedData: Partial<ISlide>,
-    imageFiles?: File[]
+    imageFiles?: File[],
+    prevLessonId?: string,
+    newLessonId?: string
   ) => {
     try {
       if (!process.env.NEXT_PUBLIC_API_URL) {
@@ -671,6 +674,55 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
           slide._id === updatedSlide._id ? updatedSlide : slide
         )
       );
+
+      // Ensure the lesson's slides array is updated to include this slide
+      if (prevLessonId && newLessonId && prevLessonId !== newLessonId) {
+        try {
+          // Add to new lesson
+          await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/lessons/${newLessonId}`,
+            {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ $addToSet: { slides: updatedSlide._id } }),
+            }
+          );
+          // Remove from previous lesson
+          await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/lessons/${prevLessonId}`,
+            {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ $pull: { slides: updatedSlide._id } }),
+            }
+          );
+        } catch (err) {
+          console.error(
+            "Failed to update lesson slides array after slide update",
+            err
+          );
+        }
+      } else if (newLessonId) {
+        // If only newLessonId is present (e.g., slide was not previously assigned), just add
+        try {
+          await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/lessons/${newLessonId}`,
+            {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ $addToSet: { slides: updatedSlide._id } }),
+            }
+          );
+        } catch (err) {
+          console.error(
+            "Failed to add slide to new lesson after slide update",
+            err
+          );
+        }
+      }
 
       toast.success("Slide updated successfully!");
       return updatedSlide;
@@ -738,14 +790,7 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading course...</p>
-        </div>
-      </div>
-    );
+    return <CourseEditorPageSkeleton />;
   }
 
   if (!course) {
@@ -1154,14 +1199,36 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
               if (!editingSlide?._id) {
                 throw new Error("No slide ID provided for update");
               }
+              // Track previous lesson ID (ensure string)
+              let prevLessonId: string | undefined = undefined;
+              if (editingSlide.lesson) {
+                if (typeof editingSlide.lesson === "string")
+                  prevLessonId = editingSlide.lesson;
+                else if (
+                  editingSlide.lesson &&
+                  typeof editingSlide.lesson === "object" &&
+                  "toString" in editingSlide.lesson
+                )
+                  prevLessonId = editingSlide.lesson.toString();
+              }
+              let newLessonId: string | undefined = undefined;
+              if (data.lesson) {
+                if (typeof data.lesson === "string") newLessonId = data.lesson;
+                else if (
+                  data.lesson &&
+                  typeof data.lesson === "object" &&
+                  "toString" in data.lesson
+                )
+                  newLessonId = data.lesson.toString();
+              }
               await handleUpdateSlide(
                 editingSlide._id.toString(),
                 {
                   title: data.title,
                   content: data.content,
                   order: data.order,
-                  lesson: data.lesson
-                    ? new Types.ObjectId(data.lesson.toString())
+                  lesson: newLessonId
+                    ? new Types.ObjectId(newLessonId)
                     : undefined,
                   titleFont: data.titleFont,
                   contentFont: data.contentFont,
@@ -1173,8 +1240,11 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
                     main: data.themeColors?.main || "#3b82f6",
                     secondary: data.themeColors?.secondary || "#64748b",
                   },
+                  imageUrls: data.imageUrls,
                 },
-                imageFiles
+                imageFiles,
+                prevLessonId !== newLessonId ? prevLessonId : undefined,
+                prevLessonId !== newLessonId ? newLessonId : undefined
               );
               setIsEditSlideOpen(false);
               setEditingSlide(null);

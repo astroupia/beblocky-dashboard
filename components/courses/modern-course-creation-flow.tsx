@@ -403,24 +403,6 @@ function ModernCourseForm({
                   required
                 />
               </div>
-
-              <div>
-                <Label htmlFor="category" className="text-sm font-medium">
-                  Category
-                </Label>
-                <Input
-                  id="category"
-                  value={courseData.courseTitle || ""}
-                  onChange={(e) =>
-                    setCourseData({
-                      ...courseData,
-                      courseTitle: e.target.value,
-                    })
-                  }
-                  placeholder="e.g., Web Development, Data Science"
-                  className="mt-2 bg-white/80 dark:bg-slate-800/80"
-                />
-              </div>
             </div>
           </Card>
 

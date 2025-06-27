@@ -291,84 +291,98 @@ function ModernSlideCard({
     >
       {/* Image Preview */}
       {slide.imageUrls && slide.imageUrls.length > 0 && (
-        <div className="w-full h-40 bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden border-b border-slate-200 dark:border-slate-700">
+        <div className="relative w-full h-40 bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden border-b border-slate-200 dark:border-slate-700">
           <img
             src={slide.imageUrls[0]}
             alt={slide.title}
             className="object-cover w-full h-full"
           />
+          {/* Actions Menu Overlay */}
+          <div className="absolute top-3 right-3 z-10">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 bg-black/70 hover:bg-black/90 text-white border-none shadow"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem
+                  onClick={onEdit}
+                  className="flex items-center"
+                >
+                  <Edit2 className="h-4 w-4 mr-2" />
+                  Edit Slide
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={onDelete}
+                  className="flex items-center text-destructive"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Slide
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       )}
 
-      <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent dark:from-slate-800/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
       {/* Slide Preview */}
-      <div
-        className="relative h-32 overflow-hidden"
-        style={{
-          backgroundColor: slide.backgroundColor || "#ffffff",
-        }}
-      >
-        <div className="absolute inset-0 p-4 flex flex-col justify-center">
-          <h4 className="font-semibold text-sm line-clamp-2">{slide.title}</h4>
-          {slide.content && (
-            <p className="text-xs mt-1 line-clamp-2 opacity-70">
-              {slide.content}
-            </p>
-          )}
-        </div>
+      {!(slide.imageUrls && slide.imageUrls.length > 0) && (
+        <div
+          className="relative h-32 overflow-hidden"
+          style={{
+            backgroundColor: slide.backgroundColor || "#ffffff",
+          }}
+        >
+          {/* Type Badge */}
+          <div className="absolute top-3 left-3">
+            <Badge
+              variant="secondary"
+              className="flex items-center gap-1 text-xs"
+            >
+              {getSlideTypeIcon(slide)}
+              {getSlideTypeLabel(slide)}
+            </Badge>
+          </div>
 
-        {/* Type Badge */}
-        <div className="absolute top-3 left-3">
-          <Badge
-            variant="secondary"
-            className="flex items-center gap-1 text-xs"
-          >
-            {getSlideTypeIcon(slide)}
-            {getSlideTypeLabel(slide)}
-          </Badge>
+          {/* Actions Menu */}
+          <div className="absolute top-3 right-3 z-10">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 bg-black/70 hover:bg-black/90 text-white border-none shadow"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem
+                  onClick={onEdit}
+                  className="flex items-center"
+                >
+                  <Edit2 className="h-4 w-4 mr-2" />
+                  Edit Slide
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={onDelete}
+                  className="flex items-center text-destructive"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Slide
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-
-        {/* Actions Menu */}
-        <div className="absolute top-3 right-3">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-slate-700 border-white/30"
-              >
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={onEdit} className="flex items-center">
-                <Edit2 className="h-4 w-4 mr-2" />
-                Edit Slide
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={onDuplicate}
-                className="flex items-center"
-              >
-                <Copy className="h-4 w-4 mr-2" />
-                Duplicate
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center">
-                <Eye className="h-4 w-4 mr-2" />
-                Preview
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={onDelete}
-                className="flex items-center text-destructive"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Slide
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+      )}
 
       {/* Content */}
       <div className="relative p-4 space-y-3">

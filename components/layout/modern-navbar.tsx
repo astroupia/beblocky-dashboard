@@ -75,6 +75,11 @@ export function ModernNavbar() {
   const [user, setUser] = useState<IUser | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [profileForm, setProfileForm] = useState<{
+    name: string;
+    email: string;
+  }>({ name: "", email: "" });
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
   const router = useRouter();
   const { theme, toggleTheme } = useThemeContext();
 
@@ -87,6 +92,24 @@ export function ModernNavbar() {
     };
     fetchUser();
   }, []);
+
+  // Fetch latest user data when profile dialog opens
+  useEffect(() => {
+    if (isProfileOpen) {
+      const fetchProfile = async () => {
+        const session = await getSession();
+        if (session && "user" in session) {
+          const user = session.user as any;
+          setProfileForm({
+            name: user.name || "",
+            email: user.email || "",
+          });
+        }
+      };
+      fetchProfile();
+      setIsEditingProfile(false); // Reset edit mode when dialog opens
+    }
+  }, [isProfileOpen]);
 
   const handleSignOut = async () => {
     try {
@@ -103,6 +126,22 @@ export function ModernNavbar() {
       .map((n) => n[0])
       .join("")
       .toUpperCase();
+  };
+
+  // Custom handler to open profile dialog after dropdown closes
+  const handleProfileClick = () => {
+    setIsProfileOpen(false); // Ensure closed first
+    setTimeout(() => setIsProfileOpen(true), 50); // Open after dropdown closes
+  };
+
+  // Cancel edit mode
+  const handleCancelEdit = () => {
+    setIsEditingProfile(false);
+    // Reset form to last loaded session data
+    setProfileForm({
+      name: user?.name || "",
+      email: user?.email || "",
+    });
   };
 
   return (
@@ -172,13 +211,14 @@ export function ModernNavbar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
+                {/* <DropdownMenuItem
+                  className="flex items-center gap-2 cursor-pointer"
+                  onClick={handleProfileClick}
+                >
+                  <User className="h-4 w-4" />
+                  Profile
+                </DropdownMenuItem> */}
                 <Dialog open={isProfileOpen} onOpenChange={setIsProfileOpen}>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
-                      <User className="h-4 w-4" />
-                      Profile
-                    </DropdownMenuItem>
-                  </DialogTrigger>
                   <DialogContent className="sm:max-w-[425px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-gray-100 dark:border-slate-800 rounded-lg shadow-xl">
                     <DialogHeader className="pb-4 border-b border-gray-200 dark:border-slate-700">
                       <DialogTitle className="text-2xl font-bold text-primary dark:text-primary-foreground">
@@ -205,11 +245,11 @@ export function ModernNavbar() {
                         </Avatar>
                         <div className="text-center">
                           <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-100">
-                            {user?.name || "User"}
+                            {profileForm.name || "User"}
                           </h3>
                           <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1">
                             <Mail className="h-3 w-3" />
-                            {user?.email}
+                            {profileForm.email}
                           </p>
                           {user?.role && (
                             <Badge
@@ -229,6 +269,7 @@ export function ModernNavbar() {
                         </div>
                       </div>
                       <div className="grid gap-4">
+                        {/* Show input fields only in edit mode, otherwise show plain text */}
                         <div className="grid gap-2">
                           <Label
                             htmlFor="name"
@@ -236,11 +277,23 @@ export function ModernNavbar() {
                           >
                             Name
                           </Label>
-                          <Input
-                            id="name"
-                            defaultValue={user?.name || ""}
-                            className="bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-slate-900 dark:text-slate-50"
-                          />
+                          {isEditingProfile ? (
+                            <Input
+                              id="name"
+                              value={profileForm.name}
+                              onChange={(e) =>
+                                setProfileForm((f) => ({
+                                  ...f,
+                                  name: e.target.value,
+                                }))
+                              }
+                              className="bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-slate-900 dark:text-slate-50"
+                            />
+                          ) : (
+                            <div className="py-2 px-3 rounded bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-50">
+                              {profileForm.name}
+                            </div>
+                          )}
                         </div>
                         <div className="grid gap-2">
                           <Label
@@ -249,15 +302,44 @@ export function ModernNavbar() {
                           >
                             Email
                           </Label>
-                          <Input
-                            id="email"
-                            defaultValue={user?.email || ""}
-                            type="email"
-                            disabled
-                            className="bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 cursor-not-allowed"
-                          />
+                          {isEditingProfile ? (
+                            <Input
+                              id="email"
+                              value={profileForm.email}
+                              type="email"
+                              disabled
+                              className="bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 cursor-not-allowed"
+                            />
+                          ) : (
+                            <div className="py-2 px-3 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                              {profileForm.email}
+                            </div>
+                          )}
                         </div>
                         {/* Add more editable fields as needed */}
+                      </div>
+                      {/* Edit/Save/Cancel Buttons */}
+                      <div className="flex justify-end gap-2 pt-2">
+                        {isEditingProfile ? (
+                          <>
+                            <Button
+                              variant="outline"
+                              onClick={handleCancelEdit}
+                            >
+                              Cancel
+                            </Button>
+                            <Button variant="default" disabled>
+                              Save
+                            </Button>
+                          </>
+                        ) : (
+                          <Button
+                            variant="default"
+                            onClick={() => setIsEditingProfile(true)}
+                          >
+                            Edit
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </DialogContent>
@@ -265,10 +347,10 @@ export function ModernNavbar() {
 
                 <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                   <DialogTrigger asChild>
-                    <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
+                    {/* <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
                       <Settings className="h-4 w-4" />
                       Settings
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[425px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-gray-100 dark:border-slate-800 rounded-lg shadow-xl">
                     <DialogHeader className="pb-4 border-b border-gray-200 dark:border-slate-700">
@@ -299,7 +381,7 @@ export function ModernNavbar() {
                   </DialogContent>
                 </Dialog>
 
-                <DropdownMenuSeparator />
+                {/* <DropdownMenuSeparator /> */}
                 <DropdownMenuItem
                   className="text-red-600 cursor-pointer"
                   onClick={handleSignOut}
@@ -357,13 +439,13 @@ export function ModernNavbar() {
             <div className="pt-2 border-t border-gray-100 dark:border-slate-800">
               <Dialog open={isProfileOpen} onOpenChange={setIsProfileOpen}>
                 <DialogTrigger asChild>
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     className="w-full justify-start gap-3 text-slate-600 dark:text-slate-300"
                   >
                     <User className="h-4 w-4" />
                     Profile
-                  </Button>
+                  </Button> */}
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-gray-100 dark:border-slate-800 rounded-lg shadow-xl">
                   <DialogHeader className="pb-4 border-b border-gray-200 dark:border-slate-700">
@@ -391,11 +473,11 @@ export function ModernNavbar() {
                       </Avatar>
                       <div className="text-center">
                         <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-100">
-                          {user?.name || "User"}
+                          {profileForm.name || "User"}
                         </h3>
                         <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1">
                           <Mail className="h-3 w-3" />
-                          {user?.email}
+                          {profileForm.email}
                         </p>
                         {user?.role && (
                           <Badge
@@ -424,7 +506,13 @@ export function ModernNavbar() {
                         </Label>
                         <Input
                           id="name"
-                          defaultValue={user?.name || ""}
+                          value={profileForm.name}
+                          onChange={(e) =>
+                            setProfileForm((f) => ({
+                              ...f,
+                              name: e.target.value,
+                            }))
+                          }
                           className="bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-slate-900 dark:text-slate-50"
                         />
                       </div>
@@ -437,7 +525,7 @@ export function ModernNavbar() {
                         </Label>
                         <Input
                           id="email"
-                          defaultValue={user?.email || ""}
+                          value={profileForm.email}
                           type="email"
                           disabled
                           className="bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-slate-600 text-slate-500 dark:text-slate-400 cursor-not-allowed"
@@ -450,13 +538,13 @@ export function ModernNavbar() {
 
               <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <DialogTrigger asChild>
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     className="w-full justify-start gap-3 text-slate-600 dark:text-slate-300"
                   >
                     <Settings className="h-4 w-4" />
                     Settings
-                  </Button>
+                  </Button> */}
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-gray-100 dark:border-slate-800 rounded-lg shadow-xl">
                   <DialogHeader className="pb-4 border-b border-gray-200 dark:border-slate-700">

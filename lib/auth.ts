@@ -17,7 +17,9 @@ export const auth = betterAuth({
         path: "/",
         httpOnly: true,
         sameSite: "lax",
-        secure: process.env.NODE_ENV === "production", // Only secure in production
+        secure: process.env.NODE_ENV === "production",
+        domain:
+          process.env.NODE_ENV === "production" ? ".beblocky.com" : undefined,
       },
     },
   },

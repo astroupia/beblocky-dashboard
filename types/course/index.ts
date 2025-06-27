@@ -1,16 +1,16 @@
-import { Types } from 'mongoose';
+import { Types } from "mongoose";
 
 export enum CourseSubscriptionType {
-  FREE = 'active',
-  STARTER = 'starter',
-  BUILDER = 'builder',
-  PRO = 'pro-bundle',
-  ORGANIZATION = 'organization',
+  FREE = "Free",
+  STARTER = "Starter",
+  BUILDER = "Builder",
+  PRO = "Pro-Bundle",
+  ORGANIZATION = "Organization",
 }
 
 export enum CourseStatus {
-  ACTIVE = 'Active',
-  DRAFT = 'Draft',
+  ACTIVE = "Active",
+  DRAFT = "Draft",
 }
 
 export interface ICourse {

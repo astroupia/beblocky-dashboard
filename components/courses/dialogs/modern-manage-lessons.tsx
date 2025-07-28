@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { motion, AnimatePresence } from "framer-motion";
 import { ILesson, LessonDifficulty } from "@/types/lesson";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ModernManageLessonsProps {
   courseId: string;
@@ -43,7 +44,7 @@ export function ModernManageLessons({
   onDeleteLesson,
 }: ModernManageLessonsProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filter, setFilter] = useState<"all" | "published" | "draft">("all");
+  const [activeTab, setActiveTab] = useState<"all" | LessonDifficulty>("all");
 
   const filteredLessons = lessons.filter((lesson) => {
     const matchesSearch =
@@ -51,8 +52,10 @@ export function ModernManageLessons({
       (lesson.description || "")
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
-    // No status field in ILesson, so always return true for filter
-    return matchesSearch;
+
+    const matchesTab = activeTab === "all" || lesson.difficulty === activeTab;
+
+    return matchesSearch && matchesTab;
   });
 
   const handleEdit = (lesson: ILesson) => {
@@ -75,11 +78,11 @@ export function ModernManageLessons({
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case "Beginner":
+      case LessonDifficulty.BEGINNER:
         return "from-green-500 to-green-600";
-      case "Intermediate":
+      case LessonDifficulty.INTERMEDIATE:
         return "from-yellow-500 to-yellow-600";
-      case "Advanced":
+      case LessonDifficulty.ADVANCED:
         return "from-red-500 to-red-600";
       default:
         return "from-gray-500 to-gray-600";
@@ -125,22 +128,27 @@ export function ModernManageLessons({
           </div>
 
           <div className="flex gap-2">
-            {["all", "published", "draft"].map((filterOption) => (
+            {[
+              "all",
+              LessonDifficulty.BEGINNER,
+              LessonDifficulty.INTERMEDIATE,
+              LessonDifficulty.ADVANCED,
+            ].map((tabOption) => (
               <Button
-                key={filterOption}
-                variant={filter === filterOption ? "default" : "outline"}
+                key={tabOption}
+                variant={activeTab === tabOption ? "default" : "outline"}
                 size="sm"
-                onClick={() => setFilter(filterOption as typeof filter)}
+                onClick={() => setActiveTab(tabOption as typeof activeTab)}
                 className="capitalize transition-all duration-300"
               >
-                {filterOption}
+                {tabOption === "all" ? "All" : tabOption}
               </Button>
             ))}
           </div>
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
           <Card className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/50 border-blue-200 dark:border-blue-800">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
@@ -169,25 +177,55 @@ export function ModernManageLessons({
             </div>
           </Card>
 
-          <Card className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/50 border-purple-200 dark:border-purple-800">
+          <Card className="p-4 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/50 dark:to-green-900/50 border-green-200 dark:border-green-800">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
                 <GraduationCap className="h-5 w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Avg. Difficulty</p>
-                <p className="text-2xl font-bold text-purple-700 dark:text-purple-300">
-                  {lessons.length > 0
-                    ? lessons.filter((l) => l.difficulty === "intermediate")
-                        .length >
-                      lessons.length / 2
-                      ? "Intermediate"
-                      : lessons.filter((l) => l.difficulty === "advanced")
-                            .length >
-                          lessons.length / 2
-                        ? "Advanced"
-                        : "Beginner"
-                    : "N/A"}
+                <p className="text-sm text-muted-foreground">Beginner</p>
+                <p className="text-2xl font-bold text-green-700 dark:text-green-300">
+                  {
+                    lessons.filter(
+                      (l) => l.difficulty === LessonDifficulty.BEGINNER
+                    ).length
+                  }
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950/50 dark:to-yellow-900/50 border-yellow-200 dark:border-yellow-800">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center">
+                <GraduationCap className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Intermediate</p>
+                <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">
+                  {
+                    lessons.filter(
+                      (l) => l.difficulty === LessonDifficulty.INTERMEDIATE
+                    ).length
+                  }
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/50 dark:to-red-900/50 border-red-200 dark:border-red-800">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center">
+                <GraduationCap className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Advanced</p>
+                <p className="text-2xl font-bold text-red-700 dark:text-red-300">
+                  {
+                    lessons.filter(
+                      (l) => l.difficulty === LessonDifficulty.ADVANCED
+                    ).length
+                  }
                 </p>
               </div>
             </div>

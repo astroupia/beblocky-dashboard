@@ -160,11 +160,11 @@ export function ModernEditLessonDialog({
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case "Beginner":
+      case LessonDifficulty.BEGINNER:
         return "from-green-500 to-green-600";
-      case "Intermediate":
+      case LessonDifficulty.INTERMEDIATE:
         return "from-yellow-500 to-yellow-600";
-      case "Advanced":
+      case LessonDifficulty.ADVANCED:
         return "from-red-500 to-red-600";
       default:
         return "from-gray-500 to-gray-600";
@@ -282,11 +282,15 @@ export function ModernEditLessonDialog({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Beginner">Beginner</SelectItem>
-                        <SelectItem value="Intermediate">
+                        <SelectItem value={LessonDifficulty.BEGINNER}>
+                          Beginner
+                        </SelectItem>
+                        <SelectItem value={LessonDifficulty.INTERMEDIATE}>
                           Intermediate
                         </SelectItem>
-                        <SelectItem value="Advanced">Advanced</SelectItem>
+                        <SelectItem value={LessonDifficulty.ADVANCED}>
+                          Advanced
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

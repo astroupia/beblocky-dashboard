@@ -70,6 +70,7 @@ export function ModernEditSlideDialog({
     lesson: undefined,
     order: 1,
     titleFont: "Inter",
+    contentFont: "Inter",
     startingCode: "",
     solutionCode: "",
     imageUrls: [],
@@ -103,6 +104,7 @@ export function ModernEditSlideDialog({
         lesson: undefined,
         order: 1,
         titleFont: "Inter",
+        contentFont: "Inter",
         startingCode: "",
         solutionCode: "",
         imageUrls: [],
@@ -172,9 +174,11 @@ export function ModernEditSlideDialog({
         setSelectedFiles((files) => files.filter((_, i) => i !== index));
       } else {
         // Remove from formData.imageUrls if it's an existing URL
+        // We need to find the correct index in the original imageUrls array
+        const removedUrl = prev[index];
         setFormData((fd) => ({
           ...fd,
-          imageUrls: (fd.imageUrls || []).filter((_, i) => i !== index),
+          imageUrls: (fd.imageUrls || []).filter((url) => url !== removedUrl),
         }));
       }
       return newImages;
@@ -220,16 +224,15 @@ export function ModernEditSlideDialog({
     setIsLoading(true);
 
     try {
-      // Only keep non-blob URLs in imageUrls
-      setFormData((fd) => ({
-        ...fd,
-        imageUrls: uploadedImages.filter((url) => !url.startsWith("blob:")),
-      }));
+      // For edit mode, we need to preserve the current formData.imageUrls
+      // and only add new images from selectedFiles
+      let finalImageUrls = formData.imageUrls || [];
+
       if (onComplete) {
         await onComplete(
           {
             ...formData,
-            imageUrls: uploadedImages.filter((url) => !url.startsWith("blob:")),
+            imageUrls: finalImageUrls,
           },
           selectedFiles
         );
@@ -444,9 +447,9 @@ export function ModernEditSlideDialog({
                         Content Font
                       </Label>
                       <Select
-                        value={formData.titleFont || "Inter"}
+                        value={formData.contentFont || "Inter"}
                         onValueChange={(value) =>
-                          setFormData({ ...formData, titleFont: value })
+                          setFormData({ ...formData, contentFont: value })
                         }
                       >
                         <SelectTrigger className="mt-2">
@@ -737,7 +740,7 @@ export function ModernEditSlideDialog({
                       className="text-sm opacity-80"
                       style={{
                         color: formData.textColor || "#333333",
-                        fontFamily: formData.titleFont || "Inter",
+                        fontFamily: formData.contentFont || "Inter",
                       }}
                     >
                       {formData.content}

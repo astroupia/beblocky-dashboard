@@ -72,7 +72,7 @@ export function ModernCourseCreationFlow({
     initialCourse || {
       courseTitle: "",
       courseDescription: "",
-      courseLanguage: "English",
+      courseLanguage: "HTML",
       subType: CourseSubscriptionType.FREE,
       status: CourseStatus.DRAFT,
       slides: [],
@@ -426,10 +426,10 @@ function ModernCourseForm({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="English">HTML</SelectItem>
-                    <SelectItem value="Spanish">Pyhton</SelectItem>
-                    <SelectItem value="French">Javasctipt</SelectItem>
-                    <SelectItem value="German">Typescript</SelectItem>
+                    <SelectItem value="HTML">HTML</SelectItem>
+                    <SelectItem value="Python">Python</SelectItem>
+                    <SelectItem value="Javascript">Javascript</SelectItem>
+                    <SelectItem value="Typescript">Typescript</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ModernHeader } from "./modern-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -26,24 +25,27 @@ import { ModernEditLessonDialog } from "./dialogs/modern-edit-lesson-dialog";
 import { ModernEditSlideDialog } from "./dialogs/modern-edit-slide-dialog";
 import {
   CourseSubscriptionType,
-  ICourse,
   CourseStatus,
   IUpdateCourseDto,
 } from "@/types/course";
-import { ILesson, ICreateLessonDto, LessonDifficulty } from "@/types/lesson";
+import { ILesson, ICreateLessonDto } from "@/types/lesson";
 import { ISlide, ICreateSlideDto } from "@/types/slide";
 import { toast } from "sonner";
 import { Types } from "mongoose";
-import { useRouter } from "next/navigation";
 import { CourseEditorPageSkeleton } from "./loading/course-edit-skeleton";
-
-interface ClientCourse extends ICourse {
-  _id: string;
-  lessonsCount?: number;
-  studentsCount?: number;
-  slidesCount?: number;
-  lastUpdated?: string;
-}
+import {
+  fetchCompleteCourseData,
+  updateCourse,
+  createLesson,
+  updateLesson,
+  deleteLesson,
+  createSlide,
+  updateSlide,
+  deleteSlide,
+  ClientCourse,
+} from "@/lib/api/course";
+import { useAuth } from "@/hooks/use-auth";
+import { encryptEmail } from "@/lib/utils";
 
 interface ModernCourseEditorProps {
   courseId: string;
@@ -64,119 +66,19 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
   const [isEditLessonOpen, setIsEditLessonOpen] = useState(false);
   const [editingSlide, setEditingSlide] = useState<ISlide | null>(null);
   const [isEditSlideOpen, setIsEditSlideOpen] = useState(false);
-  const router = useRouter();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
         setIsLoading(true);
-        if (!process.env.NEXT_PUBLIC_API_URL) {
-          throw new Error("API URL is not configured");
-        }
+        const {
+          course: courseData,
+          lessons: lessonsData,
+          slides: slidesData,
+        } = await fetchCompleteCourseData(courseId);
 
-        // Fetch course details
-        const courseResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/courses/${courseId}`,
-          {
-            credentials: "include",
-          }
-        );
-
-        if (!courseResponse.ok) {
-          throw new Error("Failed to fetch course");
-        }
-
-        const courseData = await courseResponse.json();
-
-        // Debug logging to understand the API response
-        console.log("Course API Response:", courseData);
-        console.log("Course slides:", courseData.slides);
-        console.log("Course lessons:", courseData.lessons);
-        console.log("Course students:", courseData.students);
-
-        // Fetch lessons for this course
-        const lessonsResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/lessons?courseId=${courseId}`,
-          {
-            credentials: "include",
-          }
-        );
-
-        // Fetch slides for this course
-        const slidesResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/slides?courseId=${courseId}`,
-          {
-            credentials: "include",
-          }
-        );
-
-        let lessonsData: ILesson[] = [];
-        let slidesData: ISlide[] = [];
-
-        if (lessonsResponse.ok) {
-          lessonsData = await lessonsResponse.json();
-          // No need to filter since the API now returns only course-specific lessons
-        }
-
-        if (slidesResponse.ok) {
-          slidesData = await slidesResponse.json();
-          // No need to filter since the API now returns only course-specific slides
-        }
-
-        // Transform the API response to match our interface
-        let transformedCourse: ClientCourse;
-
-        try {
-          transformedCourse = {
-            ...courseData,
-            _id: courseData._id,
-            school:
-              courseData.school && courseData.school.toString().length === 24
-                ? new Types.ObjectId(courseData.school.toString())
-                : new Types.ObjectId(), // Fallback to a new ObjectId if invalid
-            slides:
-              courseData.slides
-                ?.filter((id: any) => id && id.toString().length === 24)
-                ?.map((id: any) => new Types.ObjectId(id.toString())) || [],
-            lessons:
-              courseData.lessons
-                ?.filter((id: any) => id && id.toString().length === 24)
-                ?.map((id: any) => new Types.ObjectId(id.toString())) || [],
-            students:
-              courseData.students
-                ?.filter((id: any) => id && id.toString().length === 24)
-                ?.map((id: any) => new Types.ObjectId(id.toString())) || [],
-            lessonsCount: lessonsData.length,
-            slidesCount: slidesData.length,
-            studentsCount: courseData.students?.length || 0,
-            lastUpdated:
-              new Date(
-                courseData.updatedAt || courseData.createdAt
-              ).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-              }) + " ago",
-          };
-        } catch (error) {
-          console.error("Error transforming course data:", error);
-          console.log("Raw course data:", courseData);
-
-          // Fallback transformation with empty arrays
-          transformedCourse = {
-            ...courseData,
-            _id: courseData._id || "unknown",
-            school: new Types.ObjectId(),
-            slides: [],
-            lessons: [],
-            students: [],
-            lessonsCount: 0,
-            slidesCount: 0,
-            studentsCount: 0,
-            lastUpdated: "Recently",
-          };
-        }
-
-        setCourse(transformedCourse);
+        setCourse(courseData);
         setLessons(lessonsData);
         setSlides(slidesData);
       } catch (error) {
@@ -194,51 +96,8 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
 
   const handleUpdateCourse = async (updatedCourse: IUpdateCourseDto) => {
     try {
-      if (!process.env.NEXT_PUBLIC_API_URL) {
-        throw new Error("API URL is not configured");
-      }
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/courses/${courseId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(updatedCourse),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to update course");
-      }
-
-      const updatedData = await response.json();
-
-      setCourse((prev) =>
-        prev
-          ? {
-              ...prev,
-              ...updatedData,
-              _id: updatedData._id,
-              school: new Types.ObjectId(updatedData.school),
-              slides:
-                updatedData.slides
-                  ?.filter((id: any) => id && id.toString().length === 24)
-                  ?.map((id: any) => new Types.ObjectId(id.toString())) || [],
-              lessons:
-                updatedData.lessons
-                  ?.filter((id: any) => id && id.toString().length === 24)
-                  ?.map((id: any) => new Types.ObjectId(id.toString())) || [],
-              students:
-                updatedData.students
-                  ?.filter((id: any) => id && id.toString().length === 24)
-                  ?.map((id: any) => new Types.ObjectId(id.toString())) || [],
-            }
-          : null
-      );
-
+      const updatedData = await updateCourse(courseId, updatedCourse);
+      setCourse((prev) => (prev ? { ...prev, ...updatedData } : null));
       toast.success("Course updated successfully!");
       setHasUnsavedChanges(false);
     } catch (error) {
@@ -249,72 +108,7 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
 
   const handleCreateLesson = async (lessonData: ICreateLessonDto) => {
     try {
-      if (!process.env.NEXT_PUBLIC_API_URL) {
-        throw new Error("API URL is not configured");
-      }
-      if (
-        !lessonData.courseId ||
-        !lessonData.courseId.toString ||
-        lessonData.courseId.toString().length !== 24
-      ) {
-        console.error(
-          "Invalid or missing courseId in lesson creation:",
-          lessonData.courseId
-        );
-        throw new Error(
-          "Cannot create lesson: courseId is missing or invalid."
-        );
-      }
-
-      // Build payload according to backend contract
-      const apiPayload: any = {
-        title: lessonData.title,
-        courseId: lessonData.courseId.toString(),
-        duration: lessonData.duration,
-        difficulty: lessonData.difficulty
-          ? lessonData.difficulty.toUpperCase()
-          : "BEGINNER",
-      };
-      if (lessonData.description)
-        apiPayload.description = lessonData.description;
-      if (lessonData.slides)
-        apiPayload.slides = lessonData.slides.map((id) => id.toString());
-      if (lessonData.tags) apiPayload.tags = lessonData.tags;
-
-      console.log("Creating lesson with data:", apiPayload);
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/lessons`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(apiPayload),
-        }
-      );
-
-      console.log("Lesson creation response status:", response.status);
-
-      if (!response.ok) {
-        let errorData = null;
-        try {
-          errorData = await response.json();
-        } catch {}
-        console.error("Lesson creation error response:", errorData);
-        toast.error(
-          errorData?.message ||
-            `Failed to create lesson: ${response.status} ${response.statusText}`
-        );
-        throw new Error(
-          errorData?.message ||
-            `Failed to create lesson: ${response.status} ${response.statusText}`
-        );
-      }
-
-      const newLesson = await response.json();
-      console.log("Lesson created successfully:", newLesson);
+      const newLesson = await createLesson(lessonData);
 
       setLessons((prev) => [...prev, newLesson]);
 
@@ -328,25 +122,6 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
             }
           : null
       );
-
-      // --- NEW: Update course lessons array in backend ---
-      try {
-        await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/courses/${lessonData.courseId}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ $push: { lessons: newLesson._id } }),
-          }
-        );
-      } catch (err) {
-        console.error(
-          "Failed to update course lessons array after lesson creation",
-          err
-        );
-      }
-      // ---------------------------------------------------
 
       toast.success("Lesson created successfully!");
       return newLesson;
@@ -366,84 +141,8 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
     imageFiles?: File[]
   ) => {
     try {
-      if (!process.env.NEXT_PUBLIC_API_URL) {
-        throw new Error("API URL is not configured");
-      }
-      if (
-        !slideData.courseId ||
-        !slideData.courseId.toString ||
-        slideData.courseId.toString().length !== 24
-      ) {
-        console.error(
-          "Invalid or missing courseId in slide creation:",
-          slideData.courseId
-        );
-        throw new Error("Cannot create slide: courseId is missing or invalid.");
-      }
+      const newSlide = await createSlide(slideData, imageFiles);
 
-      // Prepare FormData
-      const formData = new FormData();
-
-      // Add image files (if any)
-      if (imageFiles && imageFiles.length > 0) {
-        for (const file of imageFiles) {
-          formData.append("uploadImage", file);
-        }
-      }
-
-      // Only include defined values in the payload
-      const apiPayload: ICreateSlideDto = {
-        title: slideData.title,
-        order: slideData.order,
-        courseId: slideData.courseId,
-      };
-      if (slideData.content) apiPayload.content = slideData.content;
-      if (slideData.lessonId) apiPayload.lessonId = slideData.lessonId;
-      if (slideData.titleFont) apiPayload.titleFont = slideData.titleFont;
-      if (slideData.contentFont) apiPayload.contentFont = slideData.contentFont;
-      if (slideData.startingCode)
-        apiPayload.startingCode = slideData.startingCode;
-      if (slideData.solutionCode)
-        apiPayload.solutionCode = slideData.solutionCode;
-      if (slideData.backgroundColor)
-        apiPayload.backgroundColor = slideData.backgroundColor;
-      if (slideData.textColor) apiPayload.textColor = slideData.textColor;
-      if (slideData.themeColors) {
-        apiPayload.themeColors = {
-          main: slideData.themeColors.main,
-          secondary: slideData.themeColors.secondary,
-        };
-      }
-      if (slideData.imageUrls) apiPayload.imageUrls = slideData.imageUrls;
-
-      // Add slide data as JSON string
-      formData.append("data", JSON.stringify(apiPayload));
-
-      // Send as multipart/form-data (do NOT set Content-Type header manually)
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/slides`,
-        {
-          method: "POST",
-          body: formData,
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        let errorData = null;
-        try {
-          const errorText = await response.text();
-          errorData = errorText ? JSON.parse(errorText) : null;
-        } catch (parseError) {
-          // fallback
-        }
-        throw new Error(
-          errorData?.message ||
-            `Failed to create slide: ${response.status} ${response.statusText}`
-        );
-      }
-
-      const newSlide = await response.json();
       setSlides((prev) => [...prev, newSlide]);
       setCourse((prev) =>
         prev
@@ -454,34 +153,7 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
             }
           : null
       );
-      // Update course and lesson slides array in backend
-      try {
-        await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/courses/${slideData.courseId}`,
-          {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ $push: { slides: newSlide._id } }),
-          }
-        );
-        if (slideData.lessonId) {
-          await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/lessons/${slideData.lessonId}`,
-            {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              credentials: "include",
-              body: JSON.stringify({ $push: { slides: newSlide._id } }),
-            }
-          );
-        }
-      } catch (err) {
-        console.error(
-          "Failed to update course/lesson slides array after slide creation",
-          err
-        );
-      }
+
       toast.success("Slide created successfully!");
       return newSlide;
     } catch (error) {
@@ -520,34 +192,7 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
     updatedData: Partial<ILesson>
   ) => {
     try {
-      if (!process.env.NEXT_PUBLIC_API_URL) {
-        throw new Error("API URL is not configured");
-      }
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/lessons/${lessonId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(updatedData),
-        }
-      );
-
-      if (!response.ok) {
-        let errorData = null;
-        try {
-          errorData = await response.json();
-        } catch {}
-        throw new Error(
-          errorData?.message ||
-            `Failed to update lesson: ${response.status} ${response.statusText}`
-        );
-      }
-
-      const updatedLesson = await response.json();
+      const updatedLesson = await updateLesson(lessonId, updatedData);
 
       // Update lessons state with the updated lesson
       setLessons((prev) =>
@@ -571,28 +216,7 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
 
   const handleDeleteLesson = async (lessonId: string) => {
     try {
-      if (!process.env.NEXT_PUBLIC_API_URL) {
-        throw new Error("API URL is not configured");
-      }
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/lessons/${lessonId}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        let errorData = null;
-        try {
-          errorData = await response.json();
-        } catch {}
-        throw new Error(
-          errorData?.message ||
-            `Failed to delete lesson: ${response.status} ${response.statusText}`
-        );
-      }
+      await deleteLesson(lessonId);
 
       // Update lessons state by removing the deleted lesson
       setLessons((prev) =>
@@ -629,44 +253,13 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
     newLessonId?: string
   ) => {
     try {
-      if (!process.env.NEXT_PUBLIC_API_URL) {
-        throw new Error("API URL is not configured");
-      }
-
-      // Prepare FormData
-      const formData = new FormData();
-
-      // Add image files (if any)
-      if (imageFiles && imageFiles.length > 0) {
-        for (const file of imageFiles) {
-          formData.append("uploadImage", file);
-        }
-      }
-
-      // Add slide data as JSON string
-      formData.append("data", JSON.stringify(updatedData));
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/slides/${slideId}`,
-        {
-          method: "PATCH",
-          body: formData,
-          credentials: "include",
-        }
+      const updatedSlide = await updateSlide(
+        slideId,
+        updatedData,
+        imageFiles,
+        prevLessonId,
+        newLessonId
       );
-
-      if (!response.ok) {
-        let errorData = null;
-        try {
-          errorData = await response.json();
-        } catch {}
-        throw new Error(
-          errorData?.message ||
-            `Failed to update slide: ${response.status} ${response.statusText}`
-        );
-      }
-
-      const updatedSlide = await response.json();
 
       // Update slides state with the updated slide
       setSlides((prev) =>
@@ -674,55 +267,6 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
           slide._id === updatedSlide._id ? updatedSlide : slide
         )
       );
-
-      // Ensure the lesson's slides array is updated to include this slide
-      if (prevLessonId && newLessonId && prevLessonId !== newLessonId) {
-        try {
-          // Add to new lesson
-          await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/lessons/${newLessonId}`,
-            {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              credentials: "include",
-              body: JSON.stringify({ $addToSet: { slides: updatedSlide._id } }),
-            }
-          );
-          // Remove from previous lesson
-          await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/lessons/${prevLessonId}`,
-            {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              credentials: "include",
-              body: JSON.stringify({ $pull: { slides: updatedSlide._id } }),
-            }
-          );
-        } catch (err) {
-          console.error(
-            "Failed to update lesson slides array after slide update",
-            err
-          );
-        }
-      } else if (newLessonId) {
-        // If only newLessonId is present (e.g., slide was not previously assigned), just add
-        try {
-          await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/lessons/${newLessonId}`,
-            {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              credentials: "include",
-              body: JSON.stringify({ $addToSet: { slides: updatedSlide._id } }),
-            }
-          );
-        } catch (err) {
-          console.error(
-            "Failed to add slide to new lesson after slide update",
-            err
-          );
-        }
-      }
 
       toast.success("Slide updated successfully!");
       return updatedSlide;
@@ -739,28 +283,7 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
 
   const handleDeleteSlide = async (slideId: string) => {
     try {
-      if (!process.env.NEXT_PUBLIC_API_URL) {
-        throw new Error("API URL is not configured");
-      }
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/slides/${slideId}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        let errorData = null;
-        try {
-          errorData = await response.json();
-        } catch {}
-        throw new Error(
-          errorData?.message ||
-            `Failed to delete slide: ${response.status} ${response.statusText}`
-        );
-      }
+      await deleteSlide(slideId);
 
       // Update slides state by removing the deleted slide
       setSlides((prev) =>
@@ -867,7 +390,16 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
                     Save Changes
                   </Button>
                 )}
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    window.open(
+                      `https://ide.beblocky.com/courses/${courseId}/learn/user/${encryptEmail(user?.email || "")}`,
+                      "_blank"
+                    )
+                  }
+                >
                   <Eye className="h-4 w-4 mr-2" />
                   Preview
                 </Button>
@@ -1018,7 +550,12 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
               onCreateLesson={() => setIsCreateLessonOpen(true)}
               onCreateSlide={() => setIsCreateSlideOpen(true)}
               onViewAnalytics={() => setActiveTab("analytics")}
-              onPreviewCourse={() => {}}
+              onPreviewCourse={() =>
+                window.open(
+                  `https://ide.beblocky.com/courses/${courseId}/learn/user/${encryptEmail(user?.email || "")}`,
+                  "_blank"
+                )
+              }
             />
           </TabsContent>
 
@@ -1323,6 +860,14 @@ function CourseOverview({
           >
             <BarChart3 className="h-4 w-4 mr-2" />
             View Analytics
+          </Button>
+          <Button
+            onClick={onPreviewCourse}
+            className="w-full justify-start"
+            variant="outline"
+          >
+            <Eye className="h-4 w-4 mr-2" />
+            Preview Course
           </Button>
         </div>
       </Card>

@@ -26,25 +26,19 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { ICourse, CourseStatus, CourseSubscriptionType } from "@/types/course";
-import { ILesson } from "@/types/lesson";
-import { IStudent } from "@/types/student";
-import { useRouter } from "next/navigation";
+import { CourseStatus, CourseSubscriptionType } from "@/types/course";
 
-interface CourseWithDetails extends ICourse {
-  _id: string;
-  lessonsCount?: number;
-  slidesCount?: number;
-  studentsCount?: number;
-  lastUpdated?: string;
-}
+import { useRouter } from "next/navigation";
+import {
+  fetchAllCoursesWithDetails,
+  deleteCourse,
+  ClientCourse,
+} from "@/lib/api/course";
 
 export function ModernCourseGrid() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
-  const [courses, setCourses] = useState<CourseWithDetails[]>([]);
-  const [lessons, setLessons] = useState<ILesson[]>([]);
-  const [students, setStudents] = useState<IStudent[]>([]);
+  const [courses, setCourses] = useState<ClientCourse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
@@ -52,121 +46,7 @@ export function ModernCourseGrid() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-
-        // Validate API URL
-        if (!process.env.NEXT_PUBLIC_API_URL) {
-          throw new Error("API URL is not configured");
-        }
-
-        // Fetch courses
-        const coursesResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/courses`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }
-        );
-
-        if (!coursesResponse.ok) {
-          throw new Error("Failed to fetch courses");
-        }
-
-        const coursesData = await coursesResponse.json();
-
-        // Process courses with additional details using new endpoints
-        const coursesWithDetails: CourseWithDetails[] = await Promise.all(
-          coursesData.map(async (course: CourseWithDetails) => {
-            try {
-              // Fetch lessons for this specific course
-              const lessonsResponse = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/lessons?courseId=${course._id}`,
-                {
-                  method: "GET",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  credentials: "include",
-                }
-              );
-
-              // Fetch slides for this specific course
-              const slidesResponse = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/slides?courseId=${course._id}`,
-                {
-                  method: "GET",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  credentials: "include",
-                }
-              );
-
-              let courseLessons: ILesson[] = [];
-              let courseSlides: any[] = [];
-
-              if (lessonsResponse.ok) {
-                courseLessons = await lessonsResponse.json();
-              }
-
-              if (slidesResponse.ok) {
-                courseSlides = await slidesResponse.json();
-              }
-
-              // Count students enrolled in this course
-              const studentsResponse = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/students`,
-                {
-                  method: "GET",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  credentials: "include",
-                }
-              );
-
-              let courseStudents: IStudent[] = [];
-              if (studentsResponse.ok) {
-                const allStudents = await studentsResponse.json();
-                courseStudents = allStudents.filter(
-                  (student: IStudent) =>
-                    student.enrolledCourses &&
-                    student.enrolledCourses.some(
-                      (courseId) =>
-                        courseId && courseId.toString() === course._id
-                    )
-                );
-              }
-
-              return {
-                ...course,
-                lessonsCount: courseLessons.length,
-                slidesCount: courseSlides.length,
-                studentsCount: courseStudents.length,
-                lastUpdated:
-                  new Date().toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  }) + " ago", // Simplified for now
-              };
-            } catch (error) {
-              console.error(
-                `Error fetching details for course ${course._id}:`,
-                error
-              );
-              return {
-                ...course,
-                lessonsCount: 0,
-                slidesCount: 0,
-                studentsCount: 0,
-                lastUpdated: "Recently",
-              };
-            }
-          })
-        );
-
+        const coursesWithDetails = await fetchAllCoursesWithDetails();
         setCourses(coursesWithDetails);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -209,25 +89,7 @@ export function ModernCourseGrid() {
 
   const handleDeleteCourse = async (courseId: string) => {
     try {
-      if (!process.env.NEXT_PUBLIC_API_URL) {
-        throw new Error("API URL is not configured");
-      }
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/courses/${courseId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to delete course");
-      }
-
+      await deleteCourse(courseId);
       // Remove the course from the local state
       setCourses(courses.filter((course) => course._id !== courseId));
       toast.success("Course deleted successfully!");
@@ -376,7 +238,7 @@ export function ModernCourseGrid() {
 }
 
 interface ModernCourseCardProps {
-  course: CourseWithDetails;
+  course: ClientCourse;
   onDelete: (courseId: string) => void;
 }
 
@@ -417,9 +279,10 @@ function ModernCourseCard({ course, onDelete }: ModernCourseCardProps) {
 
   return (
     <Card
-      className="group relative overflow-hidden border-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105"
+      className="group relative overflow-hidden border-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105 cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleEdit}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent dark:from-slate-800/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
@@ -450,11 +313,12 @@ function ModernCourseCard({ course, onDelete }: ModernCourseCardProps) {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                onClick={(e) => e.stopPropagation()}
               >
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent onClick={(e) => e.stopPropagation()}>
               <DropdownMenuItem
                 onClick={handleEdit}
                 className="flex items-center"

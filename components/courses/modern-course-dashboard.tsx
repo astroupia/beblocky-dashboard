@@ -20,10 +20,9 @@ export default function ModernCourseDashboard() {
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
   };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
-      <div className="container mx-auto px-6 py-8 pt-24">
+      <div className="container mx-auto px-6 py-8 pt-3">
         {/* Hero Section */}
         <div className="relative mb-12 overflow-hidden rounded-3xl bg-gradient-to-r from-primary/10 via-primary/5 to-secondary/10 p-8 backdrop-blur-sm">
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>

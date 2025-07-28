@@ -157,21 +157,6 @@ export function ModernEditCourseDialog({
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="category" className="text-sm font-medium">
-                    Category
-                  </Label>
-                  <Input
-                    id="category"
-                    value={formData.category}
-                    onChange={(e) =>
-                      setFormData({ ...formData, category: e.target.value })
-                    }
-                    placeholder="e.g., Web Development, Data Science"
-                    className="mt-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label
@@ -191,10 +176,10 @@ export function ModernEditCourseDialog({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="English">HTML</SelectItem>
-                        <SelectItem value="Spanish">Python</SelectItem>
-                        <SelectItem value="French">Javascript</SelectItem>
-                        <SelectItem value="German">Typescript</SelectItem>
+                        <SelectItem value="HTML">HTML</SelectItem>
+                        <SelectItem value="Python">Python</SelectItem>
+                        <SelectItem value="Javascript">Javascript</SelectItem>
+                        <SelectItem value="Typescript">Typescript</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -279,9 +264,6 @@ export function ModernEditCourseDialog({
                       {formData.subType}
                     </Badge>
                     <Badge variant="outline">{formData.courseLanguage}</Badge>
-                    {formData.category && (
-                      <Badge variant="outline">{formData.category}</Badge>
-                    )}
                     <Badge
                       variant={
                         formData.status === "Active" ? "default" : "secondary"

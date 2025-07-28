@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { motion, AnimatePresence } from "framer-motion";
 import { ISlide } from "@/types/slide";
+import { formatRelativeTime } from "@/lib/utils";
 
 interface ModernManageSlidesProps {
   courseId: string;
@@ -415,7 +416,7 @@ function ModernSlideCard({
 
         {/* Footer */}
         <div className="text-xs text-muted-foreground pt-2 border-t border-slate-200 dark:border-slate-700">
-          Updated {new Date(slide.updatedAt).toLocaleDateString()}
+          Updated {formatRelativeTime(slide.updatedAt)}
         </div>
       </div>
     </Card>

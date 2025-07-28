@@ -12,10 +12,12 @@ import {
   BookOpen,
   Mail,
   CalendarDays,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getSession, signOut } from "@/lib/auth-client";
+import { signOut } from "@/lib/auth-client";
+import { useAuth } from "@/hooks/use-auth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -72,7 +74,6 @@ const PlaceholderAvatar = () => (
 
 export function ModernNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState<IUser | null>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [profileForm, setProfileForm] = useState<{
@@ -82,32 +83,22 @@ export function ModernNavbar() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const router = useRouter();
   const { theme, toggleTheme } = useThemeContext();
+  const { user, isLoading } = useAuth();
 
+  // Update profile form when user data changes
   useEffect(() => {
-    const fetchUser = async () => {
-      const session = await getSession();
-      if (session && "user" in session) {
-        setUser(session.user as IUser);
-      }
-    };
-    fetchUser();
-  }, []);
+    if (user) {
+      setProfileForm({
+        name: user.name || "",
+        email: user.email || "",
+      });
+    }
+  }, [user]);
 
-  // Fetch latest user data when profile dialog opens
+  // Reset edit mode when profile dialog opens
   useEffect(() => {
     if (isProfileOpen) {
-      const fetchProfile = async () => {
-        const session = await getSession();
-        if (session && "user" in session) {
-          const user = session.user as any;
-          setProfileForm({
-            name: user.name || "",
-            email: user.email || "",
-          });
-        }
-      };
-      fetchProfile();
-      setIsEditingProfile(false); // Reset edit mode when dialog opens
+      setIsEditingProfile(false);
     }
   }, [isProfileOpen]);
 
@@ -172,6 +163,16 @@ export function ModernNavbar() {
               </Button>
             </Link>
 
+            <Link href="/classes">
+              <Button
+                variant="ghost"
+                className="flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all duration-300"
+              >
+                <Users className="h-4 w-4" />
+                Classes
+              </Button>
+            </Link>
+
             <Button
               variant="ghost"
               size="icon"
@@ -193,7 +194,11 @@ export function ModernNavbar() {
                   className="relative h-10 w-10 rounded-full"
                 >
                   <Avatar className="h-10 w-10 ring-2 ring-primary/20 hover:ring-primary/40 transition-all duration-300">
-                    {user?.image ? (
+                    {isLoading ? (
+                      <AvatarFallback className="bg-slate-200 dark:bg-slate-700 animate-pulse">
+                        <div className="h-4 w-4 bg-slate-300 dark:bg-slate-600 rounded"></div>
+                      </AvatarFallback>
+                    ) : user?.image ? (
                       <AvatarImage
                         src={user.image || "/placeholder.svg"}
                         alt={user.name || "User"}
@@ -434,6 +439,16 @@ export function ModernNavbar() {
               >
                 <BookOpen className="h-4 w-4" />
                 Courses
+              </Button>
+            </Link>
+            <Link href="/classes">
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-3 text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary hover:bg-primary/5 dark:hover:bg-primary/10"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Users className="h-4 w-4" />
+                Classes
               </Button>
             </Link>
             <div className="pt-2 border-t border-gray-100 dark:border-slate-800">

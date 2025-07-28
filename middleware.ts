@@ -10,19 +10,22 @@ export async function middleware(request: NextRequest) {
   // Check if the path is public
   const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
 
-  // Check for better-auth session token
+  // Check for better-auth session token - check multiple possible cookie names for deployed environments
   const sessionToken =
     request.cookies.get("better-auth.session_token")?.value ||
-    request.cookies.get("__Secure-better-auth.session_token")?.value;
+    request.cookies.get("__Secure-better-auth.session_token")?.value ||
+    request.cookies.get("__Host-better-auth.session_token")?.value ||
+    request.cookies.get("authjs.session-token")?.value ||
+    request.cookies.get("__Secure-authjs.session-token")?.value;
 
   // If not logged in and trying to access protected page
   if (!sessionToken && !isPublicPath) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
-  // If already logged in and accessing login/signup, redirect home
+  // If already logged in and accessing login/signup, redirect to courses
   if (sessionToken && isPublicPath) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/courses", request.url));
   }
 
   return NextResponse.next();

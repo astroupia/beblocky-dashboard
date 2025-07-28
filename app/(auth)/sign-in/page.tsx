@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { AuthLayout } from "@/components/auth/auth-layout";
 import { Button } from "@/components/ui/button";
@@ -17,11 +17,12 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Github, Mail, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { signIn } from "@/lib/auth-client";
+import { signIn, useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
 export default function SignInPage() {
   const router = useRouter();
+  const session = useSession();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -29,6 +30,38 @@ export default function SignInPage() {
     email: "",
     password: "",
   });
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (session.data?.user) {
+      console.log("User already authenticated, redirecting to /courses");
+      window.location.href = "/courses";
+    }
+  }, [session.data]);
+
+  // Show loading while checking authentication status
+  if (session.isPending) {
+    return (
+      <AuthLayout mode="signin">
+        <div className="text-center">
+          <div className="h-8 w-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Checking authentication...</p>
+        </div>
+      </AuthLayout>
+    );
+  }
+
+  // Don't render the form if already authenticated
+  if (session.data?.user) {
+    return (
+      <AuthLayout mode="signin">
+        <div className="text-center">
+          <div className="h-8 w-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Redirecting...</p>
+        </div>
+      </AuthLayout>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +83,16 @@ export default function SignInPage() {
       }
 
       console.log("Sign-in successful, redirecting to /courses");
-      router.push("/courses");
+
+      // Use window.location.href for more reliable redirects in deployed environments
+      window.location.href = "/courses";
+
+      // Fallback: if window.location.href doesn't work, try router.push
+      setTimeout(() => {
+        if (window.location.pathname !== "/courses") {
+          router.push("/courses");
+        }
+      }, 1000);
     } catch (err) {
       console.error("Sign-in error:", err);
       setError(err instanceof Error ? err.message : "Failed to sign in");

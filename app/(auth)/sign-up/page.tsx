@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { AuthLayout } from "@/components/auth/auth-layout";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Github, Mail, Eye, EyeOff, User } from "lucide-react";
 import Link from "next/link";
-import { signUp } from "@/lib/auth-client";
+import { signUp, useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { teacherApi } from "@/lib/api/teacher";
 import { userApi } from "@/lib/api/user";
@@ -26,6 +26,7 @@ import type { IUser } from "@/types/user";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const session = useSession();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +39,38 @@ export default function SignUpPage() {
     password: "",
     confirmPassword: "",
   });
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (session.data?.user) {
+      console.log("User already authenticated, redirecting to /courses");
+      window.location.href = "/courses";
+    }
+  }, [session.data]);
+
+  // Show loading while checking authentication status
+  if (session.isPending) {
+    return (
+      <AuthLayout mode="signup">
+        <div className="text-center">
+          <div className="h-8 w-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Checking authentication...</p>
+        </div>
+      </AuthLayout>
+    );
+  }
+
+  // Don't render the form if already authenticated
+  if (session.data?.user) {
+    return (
+      <AuthLayout mode="signup">
+        <div className="text-center">
+          <div className="h-8 w-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Redirecting...</p>
+        </div>
+      </AuthLayout>
+    );
+  }
 
   const createTeacherProfile = async (userId: string) => {
     setIsCreatingProfile(true);
@@ -176,7 +209,16 @@ export default function SignUpPage() {
       }
 
       toast.success("Account created successfully! Welcome to the platform.");
-      router.push("/");
+
+      // Use window.location.href for more reliable redirects in deployed environments
+      window.location.href = "/courses";
+
+      // Fallback: if window.location.href doesn't work, try router.push
+      setTimeout(() => {
+        if (window.location.pathname !== "/courses") {
+          router.push("/courses");
+        }
+      }, 1000);
     } catch (err) {
       console.error("Sign-up error:", err);
       setError(err instanceof Error ? err.message : "Failed to sign up");

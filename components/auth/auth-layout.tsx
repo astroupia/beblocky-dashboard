@@ -1,19 +1,22 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { motion } from "framer-motion"
-import { AuthSidebar } from "./auth-sidebar"
-import { AuthHeader } from "./auth-header"
+import { motion } from "framer-motion";
+import { AuthSidebar } from "./auth-sidebar";
+import { AuthHeader } from "./auth-header";
 
 interface AuthLayoutProps {
-  children: React.ReactNode
-  mode: "signin" | "signup"
+  children: React.ReactNode;
+  mode: "signin" | "signup";
 }
 
 export function AuthLayout({ children, mode }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+    <div
+      className="min-h-screen flex bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800"
+      suppressHydrationWarning
+    >
       {/* Left sidebar with features and testimonial */}
       <AuthSidebar mode={mode} />
 
@@ -31,5 +34,5 @@ export function AuthLayout({ children, mode }: AuthLayoutProps) {
         </div>
       </motion.main>
     </div>
-  )
+  );
 }

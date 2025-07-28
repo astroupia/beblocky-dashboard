@@ -86,7 +86,12 @@ export const teacherApi = {
   async getTeacherByUserId(userId: string, user: IUser): Promise<ITeacher> {
     try {
       const authHeaders = getAuthHeaders(user);
-      const response = await fetch(getApiUrl(`/teacher/user/${userId}`), {
+      const apiUrl = getApiUrl(`/teachers/user/${userId}`);
+      console.log("Teacher API - Calling URL:", apiUrl);
+      console.log("Teacher API - User ID:", userId);
+      console.log("Teacher API - Auth headers:", authHeaders);
+
+      const response = await fetch(apiUrl, {
         headers: authHeaders,
         credentials: "include",
       });
@@ -115,6 +120,12 @@ export const teacherApi = {
 
       const result = await response.json();
       console.log("Teacher retrieved successfully:", result);
+      console.log("Teacher response structure:", {
+        hasOrganizationId: "organizationId" in result,
+        organizationId: result.organizationId,
+        organizationIdType: typeof result.organizationId,
+        allKeys: Object.keys(result),
+      });
       return result;
     } catch (error) {
       console.error("Teacher API error:", error);

@@ -18,7 +18,14 @@ export default function CoursesPage() {
 
   useEffect(() => {
     const checkUserAccess = async () => {
+      console.log("Courses page - useEffect triggered");
+      console.log("Courses page - Session data:", session.data);
+      console.log("Courses page - Session user:", session.data?.user);
+
       if (!session.data?.user?.email) {
+        console.log(
+          "Courses page - No session user email, setting loading to false"
+        );
         setIsLoading(false);
         return;
       }
@@ -26,19 +33,68 @@ export default function CoursesPage() {
       try {
         // Get user data
         const user = await userApi.getUserByEmail(session.data.user.email);
+        console.log("Courses page - Retrieved user data:", user);
         setUserData(user);
 
         // Check if user is teacher or admin
         if (user.role === "teacher" || user.role === "admin") {
           try {
-            // Get teacher data to check organization association
-            // Use 'id' if available (better-auth), otherwise use '_id' (API response)
-            const userId = (user as any).id || user._id || user.email;
-            const teacher = await teacherApi.getTeacherByUserId(userId, user);
+            // Use session user ID directly from better-auth
+            const sessionUserId = session.data.user.id;
+            console.log("Courses page - Session user ID:", sessionUserId);
+            console.log("Courses page - Session user data:", session.data.user);
+
+            const teacher = await teacherApi.getTeacherByUserId(
+              sessionUserId,
+              user
+            );
+            console.log("Courses page - Teacher data retrieved:", teacher);
+            console.log(
+              "Courses page - Teacher organizationId:",
+              teacher.organizationId
+            );
+            console.log(
+              "Courses page - Teacher organizationId type:",
+              typeof teacher.organizationId
+            );
+            console.log(
+              "Courses page - Teacher organizationId truthy check:",
+              !!teacher.organizationId
+            );
+
+            // Check for different possible organization ID field names
+            const possibleOrgFields = [
+              "organizationId",
+              "organization_id",
+              "organization",
+              "orgId",
+              "org_id",
+            ];
+            const foundOrgField = possibleOrgFields.find(
+              (field) => (teacher as any)[field]
+            );
+            console.log("Courses page - Possible org fields check:", {
+              possibleFields: possibleOrgFields,
+              foundField: foundOrgField,
+              foundValue: foundOrgField
+                ? (teacher as any)[foundOrgField]
+                : null,
+            });
+
             setTeacherData(teacher);
 
-            // Check if teacher has organization
-            setHasOrganization(!!teacher.organizationId);
+            // Check if teacher has organization - try multiple field names
+            const hasOrg =
+              !!teacher.organizationId ||
+              !!(teacher as any).organization_id ||
+              !!(teacher as any).organization ||
+              !!(teacher as any).orgId ||
+              !!(teacher as any).org_id;
+            console.log(
+              "Courses page - Has organization check result:",
+              hasOrg
+            );
+            setHasOrganization(hasOrg);
           } catch (teacherError) {
             console.log("Teacher lookup error:", teacherError);
 

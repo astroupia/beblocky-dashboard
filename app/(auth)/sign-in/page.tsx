@@ -36,17 +36,23 @@ export default function SignInPage() {
     setError("");
 
     try {
+      console.log("Starting sign-in process for email:", formData.email);
+
       const result = await signIn.email({
         email: formData.email,
         password: formData.password,
       });
 
+      console.log("Sign-in result:", result);
+
       if ("error" in result && result.error?.message) {
         throw new Error(result.error.message);
       }
 
-      router.push("/");
+      console.log("Sign-in successful, redirecting to /courses");
+      router.push("/courses");
     } catch (err) {
+      console.error("Sign-in error:", err);
       setError(err instanceof Error ? err.message : "Failed to sign in");
     } finally {
       setIsLoading(false);

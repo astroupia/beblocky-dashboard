@@ -14,7 +14,8 @@ export default function CoursesPage() {
   const [teacherData, setTeacherData] = useState<ITeacher | null>(null);
   const [userData, setUserData] = useState<IUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [hasOrganization, setHasOrganization] = useState(false);
+  const [hasOrganization, setHasOrganization] = useState<boolean | null>(null); // null = not determined yet
+  const [isDataComplete, setIsDataComplete] = useState(false);
 
   useEffect(() => {
     const checkUserAccess = async () => {
@@ -22,11 +23,25 @@ export default function CoursesPage() {
       console.log("Courses page - Session data:", session.data);
       console.log("Courses page - Session user:", session.data?.user);
 
+      // Don't proceed if session is still loading
+      if (session.isPending) {
+        console.log("Courses page - Session still loading, waiting...");
+        return;
+      }
+
+      // Reset states for new check
+      setIsLoading(true);
+      setHasOrganization(null);
+      setIsDataComplete(false);
+      setTeacherData(null);
+      setUserData(null);
+
       if (!session.data?.user?.email) {
         console.log(
           "Courses page - No session user email, setting loading to false"
         );
         setIsLoading(false);
+        setIsDataComplete(true);
         return;
       }
 
@@ -123,20 +138,24 @@ export default function CoursesPage() {
         setHasOrganization(true);
       } finally {
         setIsLoading(false);
+        setIsDataComplete(true);
       }
     };
 
     checkUserAccess();
-  }, [session.data?.user?.email]);
+  }, [session.data?.user?.email, session.isPending]);
 
-  if (isLoading) {
+  // Show loading state while data is being fetched
+  if (isLoading || !isDataComplete || session.isPending) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
         <div className="container mx-auto px-6 py-8 pt-24">
           <div className="flex items-center justify-center">
             <div className="h-8 w-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
             <span className="ml-3 text-muted-foreground">
-              Checking access...
+              {session.isPending
+                ? "Checking authentication..."
+                : "Loading courses..."}
             </span>
           </div>
         </div>
@@ -144,11 +163,11 @@ export default function CoursesPage() {
     );
   }
 
-  // Show organization requirement message if user is teacher/admin without organization
+  // Only render organization requirement if we have complete data and user is teacher/admin without organization
   if (
     userData &&
     (userData.role === "teacher" || userData.role === "admin") &&
-    !hasOrganization
+    hasOrganization === false // Explicitly check for false, not just falsy
   ) {
     return (
       <OrganizationRequirementMessage

@@ -1,48 +1,41 @@
-import { Types } from 'mongoose';
+import { Types } from "mongoose";
+import { ICreateUserDto, IUpdateUserDto } from "../user";
+
+export interface IQualification {
+  degree: string;
+  institution: string;
+  year: number;
+  specialization: string;
+}
+
+export interface ITimeSlot {
+  startTime: string;
+  endTime: string;
+}
 
 export interface ITeacher {
-  userId: Types.ObjectId;
-  organizationId: Types.ObjectId;
-  rating: number;
+  _id?: string; // MongoDB ObjectId as string
+  userId: string; // String ID from better-auth
+  qualifications: IQualification[];
+  availability: Map<string, ITimeSlot[]>;
+  rating: number[];
   courses: Types.ObjectId[];
-  availability: {
-    [key: string]: {
-      start: string;
-      end: string;
-    }[];
-  };
-  specialties: string[];
-  bio?: string;
+  organizationId: Types.ObjectId;
+  languages: string[];
+  subscription?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface ICreateTeacherDto {
-  userId: Types.ObjectId;
+export interface ICreateTeacherDto extends ICreateUserDto {
+  qualifications?: IQualification[];
+  availability?: Map<string, ITimeSlot[]>;
+  rating?: number[];
+  courses?: Types.ObjectId[];
   organizationId: Types.ObjectId;
-  specialties: string[];
-  bio?: string;
+  languages?: string[];
+  subscription?: Types.ObjectId;
 }
 
-export interface IUpdateTeacherDto {
-  organizationId?: Types.ObjectId;
-  rating?: number;
-  specialties?: string[];
-  bio?: string;
-}
-
-export interface IUpdateAvailabilityDto {
-  day: string;
-  slots: Array<{
-    start: string;
-    end: string;
-  }>;
-}
-
-export interface IAddCourseDto {
-  courseId: Types.ObjectId;
-}
-
-export interface IUpdateRatingDto {
-  rating: number;
-}
+export type IUpdateTeacherDto = Partial<ICreateTeacherDto> &
+  Partial<IUpdateUserDto>;

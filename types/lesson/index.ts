@@ -7,36 +7,29 @@ export enum LessonDifficulty {
 }
 
 export interface ILesson {
-  _id?: Types.ObjectId;
+  _id?: string; // MongoDB ObjectId as string
   title: string;
-  description: string;
+  description?: string;
   courseId: Types.ObjectId;
   slides: Types.ObjectId[];
   difficulty: LessonDifficulty;
   duration: number;
-  tags?: string[];
+  tags: string[];
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface ICreateLessonDto {
   title: string;
-  description: string;
+  description?: string;
   courseId: Types.ObjectId;
-  difficulty: LessonDifficulty;
+  slides?: Types.ObjectId[];
+  difficulty?: LessonDifficulty;
   duration: number;
   tags?: string[];
-  slides?: Types.ObjectId[];
 }
 
-export interface IUpdateLessonDto {
-  title?: string;
-  description?: string;
-  difficulty?: LessonDifficulty;
-  duration?: number;
-  tags?: string[];
-  slides?: Types.ObjectId[];
-}
+export type IUpdateLessonDto = Partial<ICreateLessonDto>;
 
 export interface IAddSlideDto {
   slideId: Types.ObjectId;

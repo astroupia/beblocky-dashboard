@@ -1,26 +1,25 @@
 import { Types } from "mongoose";
 
-interface ThemeColorsDto {
+// Define ThemeColorsDto locally since the import doesn't exist
+export interface ThemeColorsDto {
   main: string;
   secondary: string;
-  accent: string;
 }
 
 export interface ISlide {
-  _id?: Types.ObjectId;
+  _id?: string; // MongoDB ObjectId as string
   title: string;
   content?: string;
   course: Types.ObjectId;
   lesson?: Types.ObjectId;
   order: number;
-  titleFont?: string;
-  contentFont?: string;
+  titleFont: string;
   startingCode?: string;
   solutionCode?: string;
-  imageUrls?: string[];
-  backgroundColor?: string;
-  textColor?: string;
-  themeColors?: {
+  imageUrls: string[];
+  backgroundColor: string;
+  textColor: string;
+  themeColors: {
     main: string;
     secondary: string;
   };
@@ -31,9 +30,9 @@ export interface ISlide {
 export interface ICreateSlideDto {
   title: string;
   content?: string;
-  courseId: Types.ObjectId;
-  lessonId?: Types.ObjectId;
   order: number;
+  courseId: Types.ObjectId;
+  lessonId: Types.ObjectId;
   titleFont?: string;
   contentFont?: string;
   startingCode?: string;
@@ -41,29 +40,14 @@ export interface ICreateSlideDto {
   imageUrls?: string[];
   backgroundColor?: string;
   textColor?: string;
-  themeColors?: {
-    main: string;
-    secondary: string;
-  };
+  themeColors?: ThemeColorsDto;
+  imageUrl?: string;
+  videoUrl?: string;
 }
 
-export interface IUpdateSlideDto {
-  title?: string;
-  content?: string;
-  lessonId?: Types.ObjectId;
-  order?: number;
-  titleFont?: string;
-  contentFont?: string;
-  startingCode?: string;
-  solutionCode?: string;
-  imageUrls?: string[];
-  backgroundColor?: string;
-  textColor?: string;
-  themeColors?: {
-    main: string;
-    secondary: string;
-  };
-}
+export type IUpdateSlideDto = Partial<
+  Omit<ICreateSlideDto, "courseId" | "lessonId">
+>;
 
 export interface IReorderSlidesDto {
   slideIds: Types.ObjectId[];

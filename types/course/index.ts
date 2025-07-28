@@ -1,11 +1,11 @@
 import { Types } from "mongoose";
 
 export enum CourseSubscriptionType {
-  FREE = "Free",
-  STARTER = "Starter",
-  BUILDER = "Builder",
-  PRO = "Pro-Bundle",
-  ORGANIZATION = "Organization",
+  FREE = "free",
+  STARTER = "starter",
+  BUILDER = "builder",
+  PRO = "pro-bundle",
+  ORGANIZATION = "organization",
 }
 
 export enum CourseStatus {
@@ -20,38 +20,77 @@ export interface ICourse {
   slides: Types.ObjectId[];
   lessons: Types.ObjectId[];
   students: Types.ObjectId[];
+  organization: Types.ObjectId[];
   subType: CourseSubscriptionType;
   status: CourseStatus;
   rating: number;
-  school: Types.ObjectId;
   language: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface ICreateCourseDto {
   courseTitle: string;
-  courseDescription: string;
+  courseDescription?: string;
   courseLanguage: string;
+  lessonIds?: Types.ObjectId[];
+  slideIds?: Types.ObjectId[];
+  organization?: Types.ObjectId[];
   subType?: CourseSubscriptionType;
   status?: CourseStatus;
+  rating?: number;
   language?: string;
 }
 
-export interface ICreateCourseWithContentDto extends ICreateCourseDto {
-  slides?: Array<{
-    title: string;
-    content: string;
-    order: number;
-  }>;
-  lessons?: Array<{
-    title: string;
-    description: string;
-    order: number;
-  }>;
+export type IUpdateCourseDto = Partial<ICreateCourseDto>;
+
+export interface ICreateCourseWithContentDto {
+  courseTitle: string;
+  courseDescription: string;
+  courseLanguage: string;
+  lessons?: any[]; // Simplified to avoid import conflicts
+  slides?: any[]; // Simplified to avoid import conflicts
+  subType?: CourseSubscriptionType;
+  status?: CourseStatus;
+  rating?: number;
+  language?: string;
 }
 
-export interface IUpdateCourseDto extends Partial<ICreateCourseDto> {
-  rating?: number;
-  students?: Types.ObjectId[];
-  slides?: Types.ObjectId[];
-  lessons?: Types.ObjectId[];
+// Course Rating Types
+// Rating values are now simple numbers (1-5) instead of enum
+
+export interface ICourseRating {
+  courseId: Types.ObjectId;
+  userId: string; // String ID from better-auth
+  rating: number; // Use number instead of RatingValue enum
+  review?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ICreateCourseRatingDto {
+  rating: number; // Use number instead of RatingValue enum
+  review?: string;
+}
+
+export type IUpdateCourseRatingDto = Partial<ICreateCourseRatingDto>;
+
+export interface ICourseRatingResponse {
+  id: string;
+  courseId: string;
+  userId: string;
+  rating: number; // Use number instead of RatingValue enum
+  review?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ICourseRatingStats {
+  averageRating: number;
+  totalRatings: number;
+  ratingDistribution: {
+    [key: number]: number;
+  };
+  userRating?: number; // Use number instead of RatingValue enum
+  userReview?: string;
 }

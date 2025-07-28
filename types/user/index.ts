@@ -7,6 +7,7 @@ export enum UserRole {
 }
 
 export interface IUser {
+  _id: string; // String ID from better-auth
   email: string;
   name: string;
   emailVerified: boolean;

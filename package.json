@@ -20,7 +20,7 @@
   "dependencies": {
     "@better-auth/cli": "1.2.8",
     "@emotion/is-prop-valid": "latest",
-    "@hookform/resolvers": "^3.9.1",
+    "@hookform/resolvers": "^3.10.0",
     "@prisma/client": "^6.9.0",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
@@ -64,16 +64,16 @@
     "next": "15.2.4",
     "next-themes": "^0.4.4",
     "react": "^18.2.0",
-    "react-day-picker": "8.10.1",
+    "react-day-picker": "9.7.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.54.1",
+    "react-hook-form": "^7.56.4",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.0",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.6",
-    "zod": "^3.24.1"
+    "zod": "^3.25.42"
   },
   "devDependencies": {
     "@types/node": "^22",

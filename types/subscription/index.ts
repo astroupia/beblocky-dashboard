@@ -1,52 +1,69 @@
-import { Types } from 'mongoose';
-import { CourseSubscriptionType } from '../course';
+import { Types } from "mongoose";
+
+export enum SubscriptionType {
+  FREE = "free",
+  STARTER = "starter",
+  BUILDER = "builder",
+  PRO = "pro-bundle",
+  ORGANIZATION = "organization",
+}
 
 export enum SubscriptionStatus {
-  ACTIVE = 'active',
-  EXPIRED = 'expired',
-  CANCELLED = 'cancelled',
-  PENDING = 'pending',
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  EXPIRED = "expired",
+  CANCELLED = "cancelled",
 }
 
 export interface ISubscription {
-  userId: Types.ObjectId;
-  planName: CourseSubscriptionType;
+  userId: string; // String ID from better-auth
+  type: SubscriptionType;
   status: SubscriptionStatus;
   startDate: Date;
   endDate: Date;
+  features: string[];
+  price: number;
+  currency: string;
   autoRenew: boolean;
-  paymentHistory: Array<{
-    amount: number;
-    date: Date;
-    transactionId: string;
-  }>;
+  paymentMethod?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface ICreateSubscriptionDto {
-  userId: Types.ObjectId;
-  planName: CourseSubscriptionType;
+  type: SubscriptionType;
   startDate: Date;
   endDate: Date;
+  features: string[];
+  price: number;
+  currency: string;
   autoRenew?: boolean;
+  paymentMethod?: string;
 }
 
 export interface IUpdateSubscriptionDto {
+  type?: SubscriptionType;
   status?: SubscriptionStatus;
   endDate?: Date;
+  features?: string[];
+  price?: number;
+  currency?: string;
   autoRenew?: boolean;
+  paymentMethod?: string;
 }
 
-export interface IAddPaymentDto {
-  amount: number;
-  transactionId: string;
-}
-
-export interface IFindByStatusDto {
+export interface ISubscriptionResponse {
+  id: string;
+  userId: string;
+  type: SubscriptionType;
   status: SubscriptionStatus;
-}
-
-export interface IFindByPlanDto {
-  planName: CourseSubscriptionType;
+  startDate: Date;
+  endDate: Date;
+  features: string[];
+  price: number;
+  currency: string;
+  autoRenew: boolean;
+  paymentMethod?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

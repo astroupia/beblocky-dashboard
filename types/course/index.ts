@@ -1,11 +1,11 @@
 import { Types } from "mongoose";
 
 export enum CourseSubscriptionType {
-  FREE = "free",
-  STARTER = "starter",
-  BUILDER = "builder",
-  PRO = "pro-bundle",
-  ORGANIZATION = "organization",
+  FREE = "Free",
+  STARTER = "Starter",
+  BUILDER = "Builder",
+  PRO = "Pro-Bundle",
+  ORGANIZATION = "Organization",
 }
 
 export enum CourseStatus {
@@ -33,6 +33,7 @@ export interface ICreateCourseDto {
   courseTitle: string;
   courseDescription?: string;
   courseLanguage: string;
+  userId?: string; // String ID from better-auth
   lessonIds?: Types.ObjectId[];
   slideIds?: Types.ObjectId[];
   organization?: Types.ObjectId[];
@@ -48,6 +49,7 @@ export interface ICreateCourseWithContentDto {
   courseTitle: string;
   courseDescription: string;
   courseLanguage: string;
+  userId?: string; // String ID from better-auth
   lessons?: any[]; // Simplified to avoid import conflicts
   slides?: any[]; // Simplified to avoid import conflicts
   subType?: CourseSubscriptionType;

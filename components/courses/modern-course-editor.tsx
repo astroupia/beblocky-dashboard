@@ -49,9 +49,13 @@ import { encryptEmail } from "@/lib/utils";
 
 interface ModernCourseEditorProps {
   courseId: string;
+  onCourseCreated?: () => void;
 }
 
-export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
+export function ModernCourseEditor({
+  courseId,
+  onCourseCreated,
+}: ModernCourseEditorProps) {
   const [course, setCourse] = useState<ClientCourse | null>(null);
   const [lessons, setLessons] = useState<ILesson[]>([]);
   const [slides, setSlides] = useState<ISlide[]>([]);
@@ -124,6 +128,12 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
       );
 
       toast.success("Lesson created successfully!");
+
+      // Trigger course created callback if provided
+      if (onCourseCreated) {
+        onCourseCreated();
+      }
+
       return newLesson;
     } catch (error) {
       console.error("Error creating lesson:", error);
@@ -155,6 +165,12 @@ export function ModernCourseEditor({ courseId }: ModernCourseEditorProps) {
       );
 
       toast.success("Slide created successfully!");
+
+      // Trigger course created callback if provided
+      if (onCourseCreated) {
+        onCourseCreated();
+      }
+
       return newSlide;
     } catch (error) {
       console.error("Error creating slide:", error);

@@ -27,6 +27,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { CourseStatus, CourseSubscriptionType } from "@/types/course";
+import { DeleteCourseConfirmationDialog } from "./dialogs/delete-course-confirmation-dialog";
 
 import { useRouter } from "next/navigation";
 import {
@@ -40,6 +41,11 @@ export function ModernCourseGrid() {
   const [activeTab, setActiveTab] = useState("all");
   const [courses, setCourses] = useState<ClientCourse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [courseToDelete, setCourseToDelete] = useState<ClientCourse | null>(
+    null
+  );
+  const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -89,10 +95,13 @@ export function ModernCourseGrid() {
 
   const handleDeleteCourse = async (courseId: string) => {
     try {
+      setIsDeleting(true);
       await deleteCourse(courseId);
       // Remove the course from the local state
       setCourses(courses.filter((course) => course._id !== courseId));
       toast.success("Course deleted successfully!");
+      setDeleteDialogOpen(false);
+      setCourseToDelete(null);
     } catch (error) {
       console.error("Error deleting course:", error);
       toast.error(
@@ -100,7 +109,19 @@ export function ModernCourseGrid() {
           ? error.message
           : "Failed to delete course. Please try again."
       );
+    } finally {
+      setIsDeleting(false);
     }
+  };
+
+  const openDeleteDialog = (course: ClientCourse) => {
+    setCourseToDelete(course);
+    setDeleteDialogOpen(true);
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+    setCourseToDelete(null);
   };
 
   return (
@@ -206,7 +227,7 @@ export function ModernCourseGrid() {
                       >
                         <ModernCourseCard
                           course={course}
-                          onDelete={handleDeleteCourse}
+                          onDelete={openDeleteDialog}
                         />
                       </motion.div>
                     ))}
@@ -233,13 +254,24 @@ export function ModernCourseGrid() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Delete Course Confirmation Dialog */}
+      {courseToDelete && (
+        <DeleteCourseConfirmationDialog
+          open={deleteDialogOpen}
+          onOpenChange={closeDeleteDialog}
+          courseTitle={courseToDelete.courseTitle}
+          onConfirm={() => handleDeleteCourse(courseToDelete._id)}
+          isLoading={isDeleting}
+        />
+      )}
     </div>
   );
 }
 
 interface ModernCourseCardProps {
   course: ClientCourse;
-  onDelete: (courseId: string) => void;
+  onDelete: (course: ClientCourse) => void;
 }
 
 function ModernCourseCard({ course, onDelete }: ModernCourseCardProps) {
@@ -272,9 +304,7 @@ function ModernCourseCard({ course, onDelete }: ModernCourseCardProps) {
   };
 
   const handleDelete = () => {
-    if (confirm("Are you sure you want to delete this course?")) {
-      onDelete(course._id);
-    }
+    onDelete(course);
   };
 
   return (

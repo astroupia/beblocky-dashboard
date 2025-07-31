@@ -23,28 +23,21 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Globe, Crown, Star, Users, Save } from "lucide-react";
 import { motion } from "framer-motion";
-import { CourseSubscriptionType } from "@/types/course";
-
-interface Course {
-  id: string;
-  courseTitle: string;
-  courseDescription: string;
-  courseLanguage: string;
-  subType: CourseSubscriptionType;
-  category: string;
-  status: "Active" | "Draft";
-  students: number;
-  lessons: number;
-  slides: number;
-  rating: number;
-  lastUpdated: string;
-}
+import { CourseSubscriptionType, CourseStatus } from "@/types/course";
+import {
+  updateCourse,
+  convertFromModernCourse,
+  convertToModernCourse,
+  type ModernCourse,
+  type ClientCourse,
+} from "@/lib/api/course";
+import { useSession } from "@/lib/auth-client";
 
 interface ModernEditCourseDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  course: Course;
-  onComplete: (course: Course) => void;
+  course: ClientCourse;
+  onComplete: (course: ClientCourse) => void;
 }
 
 export function ModernEditCourseDialog({
@@ -53,43 +46,75 @@ export function ModernEditCourseDialog({
   course,
   onComplete,
 }: ModernEditCourseDialogProps) {
-  const [formData, setFormData] = useState<Course>(course);
+  const session = useSession();
+  const [formData, setFormData] = useState<ModernCourse>(
+    convertToModernCourse(course)
+  );
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    setFormData(course);
+    if (open && course) {
+      setFormData(convertToModernCourse(course));
+      setError("");
+    }
   }, [course, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      if (!session.data?.user?.id) {
+        throw new Error("User not authenticated");
+      }
 
-    onComplete(formData);
-    setIsLoading(false);
+      // Convert form data back to API format
+      const updateData = convertFromModernCourse(formData);
+
+      // Call the API to update the course
+      const updatedCourse = await updateCourse(
+        course._id,
+        updateData,
+        session.data.user.id
+      );
+
+      onComplete(updatedCourse);
+      onOpenChange(false);
+    } catch (err) {
+      console.error("Failed to update course:", err);
+      setError(err instanceof Error ? err.message : "Failed to update course");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const getSubTypeIcon = (subType: string) => {
+  const getSubTypeIcon = (subType: CourseSubscriptionType) => {
     switch (subType) {
-      case "Premium":
+      case CourseSubscriptionType.PRO:
         return <Crown className="h-4 w-4" />;
-      case "Gold":
+      case CourseSubscriptionType.BUILDER:
         return <Star className="h-4 w-4" />;
+      case CourseSubscriptionType.STARTER:
+        return <Users className="h-4 w-4" />;
+      case CourseSubscriptionType.ORGANIZATION:
+        return <Users className="h-4 w-4" />;
       default:
         return <Users className="h-4 w-4" />;
     }
   };
 
-  const getSubTypeColor = (subType: string) => {
+  const getSubTypeColor = (subType: CourseSubscriptionType) => {
     switch (subType) {
-      case "Premium":
+      case CourseSubscriptionType.PRO:
         return "from-purple-500 to-purple-600";
-      case "Standard":
+      case CourseSubscriptionType.STARTER:
         return "from-blue-500 to-blue-600";
-      case "Gold":
+      case CourseSubscriptionType.BUILDER:
         return "from-yellow-500 to-yellow-600";
+      case CourseSubscriptionType.ORGANIZATION:
+        return "from-green-500 to-green-600";
       default:
         return "from-gray-500 to-gray-600";
     }
@@ -110,6 +135,12 @@ export function ModernEditCourseDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="relative z-10 space-y-8">
+          {error && (
+            <div className="p-3 text-sm text-red-500 bg-red-50 dark:bg-red-900/20 rounded-md">
+              {error}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column - Form Fields */}
             <div className="space-y-6">
@@ -280,15 +311,19 @@ export function ModernEditCourseDialog({
 
                   <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-200 dark:border-slate-700">
                     <div className="text-center">
-                      <p className="text-lg font-semibold">{course.students}</p>
+                      <p className="text-lg font-semibold">
+                        {formData.students}
+                      </p>
                       <p className="text-xs text-muted-foreground">Students</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-lg font-semibold">{course.lessons}</p>
+                      <p className="text-lg font-semibold">
+                        {formData.lessons}
+                      </p>
                       <p className="text-xs text-muted-foreground">Lessons</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-lg font-semibold">{course.slides}</p>
+                      <p className="text-lg font-semibold">{formData.slides}</p>
                       <p className="text-xs text-muted-foreground">Slides</p>
                     </div>
                   </div>

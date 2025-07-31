@@ -78,9 +78,11 @@ export function ModernCourseCreationFlow({
       slides: [],
       lessons: [],
       students: [],
+      organization: [],
       rating: 0,
-      school: new Types.ObjectId(),
       language: "English",
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }
   );
 
@@ -196,7 +198,7 @@ export function ModernCourseCreationFlow({
     { value: CourseSubscriptionType.FREE, label: "Free" },
     { value: CourseSubscriptionType.STARTER, label: "Starter" },
     { value: CourseSubscriptionType.BUILDER, label: "Builder" },
-    { value: CourseSubscriptionType.PRO, label: "Pro" },
+    { value: CourseSubscriptionType.PRO, label: "Pro-Bundle" },
     { value: CourseSubscriptionType.ORGANIZATION, label: "Organization" },
   ];
 
@@ -347,7 +349,7 @@ function ModernCourseForm({
     { value: CourseSubscriptionType.FREE, label: "Free" },
     { value: CourseSubscriptionType.STARTER, label: "Starter" },
     { value: CourseSubscriptionType.BUILDER, label: "Builder" },
-    { value: CourseSubscriptionType.PRO, label: "Pro" },
+    { value: CourseSubscriptionType.PRO, label: "Pro-Bundle" },
     { value: CourseSubscriptionType.ORGANIZATION, label: "Organization" },
   ];
 

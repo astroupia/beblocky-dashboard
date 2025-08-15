@@ -33,6 +33,7 @@ import { ISlide, ICreateSlideDto } from "@/types/slide";
 import { toast } from "sonner";
 import { Types } from "mongoose";
 import { CourseEditorPageSkeleton } from "./loading/course-edit-skeleton";
+import { CourseNotFound } from "./course-not-found";
 import {
   fetchCompleteCourseData,
   updateCourse,
@@ -333,13 +334,7 @@ export function ModernCourseEditor({
   }
 
   if (!course) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-muted-foreground">Course not found</p>
-        </div>
-      </div>
-    );
+    return <CourseNotFound courseId={courseId} />;
   }
 
   // Helper function to get array length safely

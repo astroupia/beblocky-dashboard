@@ -22,8 +22,12 @@ import {
 import { motion } from "framer-motion";
 import type { IClass } from "@/types/class";
 import type { IUser } from "@/types/user";
+import type { IStudent } from "@/types/student";
+import type { ClientCourse } from "@/lib/api/course";
 import { classApi } from "@/lib/api/class";
 import { userApi } from "@/lib/api/user";
+import { studentApi } from "@/lib/api/student";
+import { fetchCourse } from "@/lib/api/course";
 import { toast } from "sonner";
 import { useSession } from "@/lib/auth-client";
 import { ModernManageStudentsDialog } from "@/components/class/dialog/manage-students-dialog";
@@ -38,6 +42,8 @@ export default function ClassDetailPage() {
   const classId = params.id as string;
 
   const [classData, setClassData] = useState<IClass | null>(null);
+  const [students, setStudents] = useState<IStudent[]>([]);
+  const [courses, setCourses] = useState<ClientCourse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [isManageStudentsOpen, setIsManageStudentsOpen] = useState(false);
@@ -62,11 +68,112 @@ export default function ClassDetailPage() {
       const classDetails = await classApi.getClassById(classId, userData);
       console.log("Loaded class data:", classDetails);
       setClassData(classDetails);
+
+      // Load students and courses data
+      await loadStudentsAndCourses(classDetails);
     } catch (error) {
       console.error("Failed to load class data:", error);
       toast.error("Failed to load class details");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadStudentsAndCourses = async (classDetails: IClass) => {
+    try {
+      // Load students data with user information
+      const studentsData = await Promise.all(
+        classDetails.students.map(async (studentId) => {
+          try {
+            const student = await studentApi.getStudentByUserId(
+              studentId.toString(),
+              {
+                _id: studentId.toString(),
+                email: session.data?.user?.email || "",
+                role: "student",
+              } as IUser
+            );
+
+            // Fetch user information to get the full name
+            let userName = student.userId || studentId.toString();
+            try {
+              const userInfo = await userApi.getUserByEmail(
+                student.userId || studentId.toString()
+              );
+              userName =
+                userInfo.name ||
+                userInfo.email ||
+                student.userId ||
+                studentId.toString();
+            } catch (userError) {
+              console.error(
+                `Failed to load user info for student ${studentId}:`,
+                userError
+              );
+              // Keep the original userId if user info fetch fails
+            }
+
+            return {
+              ...student,
+              displayName: userName,
+            };
+          } catch (error) {
+            console.error(`Failed to load student ${studentId}:`, error);
+            // Return a fallback student object
+            return {
+              _id: studentId.toString(),
+              userId: studentId.toString(),
+              displayName: `Student ${studentId.toString().slice(-4)}`,
+              dateOfBirth: new Date(),
+              grade: 1,
+              gender: "other" as any,
+              enrolledCourses: [],
+              coins: 0,
+              codingStreak: 0,
+              lastCodingActivity: new Date(),
+              totalCoinsEarned: 0,
+              totalTimeSpent: 0,
+              goals: [],
+              subscription: "free",
+              section: "A",
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+          }
+        })
+      );
+      setStudents(studentsData);
+
+      // Load courses data
+      const coursesData = await Promise.all(
+        classDetails.courses.map(async (courseId) => {
+          try {
+            return await fetchCourse(courseId.toString());
+          } catch (error) {
+            console.error(`Failed to load course ${courseId}:`, error);
+            // Return a fallback course object
+            return {
+              _id: courseId.toString(),
+              courseTitle: `Course ${courseId.toString().slice(-4)}`,
+              courseDescription: "Course description not available",
+              courseLanguage: "English",
+              slides: [],
+              lessons: [],
+              students: [],
+              organization: [],
+              subType: "Free" as any,
+              status: "Draft" as any,
+              rating: 0,
+              language: "English",
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+          }
+        })
+      );
+      setCourses(coursesData);
+    } catch (error) {
+      console.error("Failed to load students and courses:", error);
     }
   };
 
@@ -523,28 +630,41 @@ export default function ClassDetailPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5" />
-                  Enrolled Students ({classData.students.length})
+                  Enrolled Students ({students.length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {classData.students.length > 0 ? (
+                {students.length > 0 ? (
                   <div className="space-y-2">
-                    {classData.students.map((studentId, index) => (
+                    {students.map((student, index) => (
                       <div
-                        key={studentId.toString()}
+                        key={student._id}
                         className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg"
                       >
                         <div className="flex items-center gap-3">
                           <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
                             <span className="text-sm font-medium">
-                              S{index + 1}
+                              {student.displayName?.slice(0, 2).toUpperCase() ||
+                                `S${index + 1}`}
                             </span>
                           </div>
-                          <span className="font-medium">
-                            Student {index + 1}
-                          </span>
+                          <div>
+                            <span className="font-medium">
+                              {student.displayName || `Student ${index + 1}`}
+                            </span>
+                            <p className="text-xs text-muted-foreground">
+                              Grade {student.grade}
+                            </p>
+                          </div>
                         </div>
-                        <Badge variant="secondary">Enrolled</Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary" className="text-xs">
+                            {student.subscription}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {student.coins} coins
+                          </Badge>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -569,26 +689,48 @@ export default function ClassDetailPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BookOpen className="h-5 w-5" />
-                  Assigned Courses ({classData.courses.length})
+                  Assigned Courses ({courses.length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {classData.courses.length > 0 ? (
+                {courses.length > 0 ? (
                   <div className="space-y-2">
-                    {classData.courses.map((courseId, index) => (
+                    {courses.map((course, index) => (
                       <div
-                        key={courseId.toString()}
+                        key={course._id}
                         className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg"
                       >
                         <div className="flex items-center gap-3">
                           <div className="h-8 w-8 rounded-full bg-green-500/20 flex items-center justify-center">
                             <BookOpen className="h-4 w-4 text-green-600" />
                           </div>
-                          <span className="font-medium">
-                            Course {index + 1}
-                          </span>
+                          <div>
+                            <span className="font-medium">
+                              {course.courseTitle}
+                            </span>
+                            <p className="text-xs text-muted-foreground">
+                              {course.courseLanguage} • {course.subType}
+                            </p>
+                          </div>
                         </div>
-                        <Badge variant="secondary">Assigned</Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant={
+                              course.status === "Active"
+                                ? "default"
+                                : "secondary"
+                            }
+                            className={
+                              course.status === "Active" ? "bg-green-500" : ""
+                            }
+                          >
+                            {course.status}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {course.lessonsCount || course.lessons?.length || 0}{" "}
+                            lessons
+                          </Badge>
+                        </div>
                       </div>
                     ))}
                   </div>
